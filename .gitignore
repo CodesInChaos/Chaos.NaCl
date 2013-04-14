@@ -1,0 +1,10 @@
+*.suo
+*.user
+*.ncb
+*.vsp
+.svn/
+bin/
+obj/
+Debug/
+Release/
+TestResults/
