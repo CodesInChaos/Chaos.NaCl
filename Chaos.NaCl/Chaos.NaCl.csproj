@@ -35,7 +35,11 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ByteIntegerConverter.cs" />
     <Compile Include="CryptoBytes.cs" />
+    <Compile Include="Ed25519Ref10\fe_cswap.cs" />
+    <Compile Include="Ed25519Ref10\fe_mul121666.cs" />
+    <Compile Include="Ed25519Ref10\scalarmult.cs" />
     <Compile Include="MontgomeryCurve25519.cs" />
     <Compile Include="Ed25519.cs" />
     <Compile Include="Ed25519Ref10\base.cs" />
@@ -85,7 +89,8 @@
     <Compile Include="Ed25519Ref10\sign.cs" />
     <Compile Include="Ed25519Ref10\sqrtm1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Salsa\HSalsa20.cs" />
+    <Compile Include="Salsa\Array16.cs" />
+    <Compile Include="Salsa\Salsa20.cs" />
     <Compile Include="Salsa\SalsaCore.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

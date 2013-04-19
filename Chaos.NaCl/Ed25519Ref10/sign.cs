@@ -5,7 +5,7 @@ namespace Chaos.NaCl.Ed25519Ref10
 {
 	internal static partial class Ed25519Operations
 	{
-		public static void crypto_sign(
+		/*public static void crypto_sign(
 		  byte[] sm, out int smlen,
 		   byte[] m, int mlen,
 		   byte[] sk
@@ -38,7 +38,7 @@ namespace Chaos.NaCl.Ed25519Ref10
 			Array.Copy(sm, 32, sm32, 0, 32);
 			ScalarOperations.sc_muladd(sm32, hram, az, r);
 			Array.Copy(sm32, 0, sm, 32, 32);
-		}
+		}*/
 
 		//ToDo: Remove
 		internal class DummyHasher : HashAlgorithm
@@ -95,6 +95,7 @@ namespace Chaos.NaCl.Ed25519Ref10
 				Array.Copy(sig, sigoffset + 32, s, 0, 32);
 				ScalarOperations.sc_muladd(s, hram, az, r);
 				Array.Copy(s, 0, sig, sigoffset + 32, 32);
+				CryptoBytes.Wipe(s);
 			}
 		}
 	}
