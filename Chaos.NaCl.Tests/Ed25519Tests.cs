@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Collections.ObjectModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Chaos.NaCl.Tests

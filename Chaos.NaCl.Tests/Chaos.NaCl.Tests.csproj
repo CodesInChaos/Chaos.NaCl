@@ -60,6 +60,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MontgomeryCurve25519Tests.cs" />
     <Compile Include="SalsaCoreTests.cs" />
+    <Compile Include="XSalsa20Poly1305Tests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Chaos.NaCl\Chaos.NaCl.csproj">

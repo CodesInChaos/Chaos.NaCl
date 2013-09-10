@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
-using Chaos.NaCl.Salsa;
+using Chaos.NaCl.Internal;
+using Chaos.NaCl.Internal.Salsa;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Chaos.NaCl.Tests
