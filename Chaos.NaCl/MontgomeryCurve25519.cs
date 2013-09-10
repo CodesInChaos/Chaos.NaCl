@@ -125,15 +125,5 @@ namespace Chaos.NaCl
             FieldOperations.fe_invert(out tempZ, ref tempZ);
             FieldOperations.fe_mul(out montgomeryX, ref tempX, ref tempZ);
         }
-
-        /*[Obsolete]
-public static byte[] EdwardsToMontgomeryX(byte[] edwardsPoint)
-{
-    Contract.Requires<ArgumentNullException>(edwardsPoint != null);
-    Contract.Requires<ArgumentException>(edwardsPoint.Length == PublicKeySizeInBytes);
-    var edwardsY = Ed25519Slow.decodepoint(edwardsPoint).Item2;
-    var montgomeryX = Ed25519Slow.mod((edwardsY + 1) * Ed25519Slow.inv(1 - edwardsY), Ed25519Slow.q);
-    return Ed25519Slow.encodeint(montgomeryX);
-}*/
     }
 }
