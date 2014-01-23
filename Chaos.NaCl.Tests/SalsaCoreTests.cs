@@ -75,9 +75,9 @@ namespace Chaos.NaCl.Tests
 			Array16<UInt32> inputState;
 			Array16<UInt32> outputState;
 
-			Array16<UInt32>.FromBytesLittleEndian(out inputState, input, 0);
+			ByteIntegerConverter.Array16LoadLittleEndian32(out inputState, input, 0);
 			SalsaCore.Salsa(out outputState, ref inputState, 20);
-			Array16<UInt32>.ToBytesLittleEndian(actualOutput, 0, ref outputState);
+			ByteIntegerConverter.Array16StoreLittleEndian32(actualOutput, 0, ref outputState);
 
 			Assert.AreEqual(BitConverter.ToString(expectedOutput), BitConverter.ToString(actualOutput));
 		}
@@ -97,12 +97,12 @@ namespace Chaos.NaCl.Tests
 				122,127,195,185,185,204,188, 90,245,9,183,248,226, 85,245,104};
 			byte[] actualOutput = new byte[64];
 			Array16<UInt32> state;
-			Array16<UInt32>.FromBytesLittleEndian(out state, input, 0);
+			ByteIntegerConverter.Array16LoadLittleEndian32(out state, input, 0);
 			for (int i = 0; i < 1000000; i++)
 			{
 				SalsaCore.Salsa(out state, ref state, 20);
 			}
-			Array16<UInt32>.ToBytesLittleEndian(actualOutput, 0, ref state);
+			ByteIntegerConverter.Array16StoreLittleEndian32(actualOutput, 0, ref state);
 
 			Assert.AreEqual(BitConverter.ToString(expectedOutput), BitConverter.ToString(actualOutput));
 		}

@@ -62,7 +62,7 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
 			/* qhasm: z2 = z1^2^1 */
 			/* asm 1: fe_sq(>z2=fe#1,<z1=fe#11); for (i = 1;i < 1;++i) fe_sq(>z2=fe#1,>z2=fe#1); */
 			/* asm 2: fe_sq(>z2=t0,<z1=z); for (i = 1;i < 1;++i) fe_sq(>z2=t0,>z2=t0); */
-			fe_sq(out t0, ref z); for (i = 1; i < 1; ++i) fe_sq(out t0, ref t0);
+			fe_sq(out t0, ref z); //for (i = 1; i < 1; ++i) fe_sq(out t0, ref t0);
 
 			/* qhasm: z8 = z2^2^2 */
 			/* asm 1: fe_sq(>z8=fe#2,<z2=fe#1); for (i = 1;i < 2;++i) fe_sq(>z8=fe#2,>z8=fe#2); */
@@ -82,7 +82,7 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
 			/* qhasm: z22 = z11^2^1 */
 			/* asm 1: fe_sq(>z22=fe#1,<z11=fe#1); for (i = 1;i < 1;++i) fe_sq(>z22=fe#1,>z22=fe#1); */
 			/* asm 2: fe_sq(>z22=t0,<z11=t0); for (i = 1;i < 1;++i) fe_sq(>z22=t0,>z22=t0); */
-			fe_sq(out t0, ref t0); for (i = 1; i < 1; ++i) fe_sq(out t0, ref  t0);
+			fe_sq(out t0, ref t0); //for (i = 1; i < 1; ++i) fe_sq(out t0, ref  t0);
 
 			/* qhasm: z_5_0 = z9*z22 */
 			/* asm 1: fe_mul(>z_5_0=fe#1,<z9=fe#2,<z22=fe#1); */

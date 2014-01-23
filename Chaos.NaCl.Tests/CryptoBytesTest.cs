@@ -7,7 +7,8 @@ namespace Chaos.NaCl.Tests
     [TestClass]
     public class CryptoBytesTest
     {
-        readonly byte[] Bytes = Enumerable.Range(0, 256).Select(i => (byte)i).ToArray();
+        readonly byte[] _bytes = Enumerable.Range(0, 256).Select(i => (byte)i).ToArray();
+
         const string HexStringUpper =
             "000102030405060708090A0B0C0D0E0F" +
             "101112131415161718191A1B1C1D1E1F" +
@@ -71,43 +72,43 @@ namespace Chaos.NaCl.Tests
         [TestMethod]
         public void ToHexStringUpper()
         {
-            Assert.AreEqual(HexStringUpper, CryptoBytes.ToHexStringUpper(Bytes));
+            Assert.AreEqual(HexStringUpper, CryptoBytes.ToHexStringUpper(_bytes));
         }
 
         [TestMethod]
         public void ToHexStringLower()
         {
-            Assert.AreEqual(HexStringLower, CryptoBytes.ToHexStringLower(Bytes));
+            Assert.AreEqual(HexStringLower, CryptoBytes.ToHexStringLower(_bytes));
         }
 
         [TestMethod]
         public void FromHexString()
         {
-            Assert.IsTrue(Bytes.SequenceEqual(CryptoBytes.FromHexString(HexStringUpper)));
+            Assert.IsTrue(_bytes.SequenceEqual(CryptoBytes.FromHexString(HexStringUpper)));
         }
 
         [TestMethod]
         public void FromHexStringLowerCase()
         {
-            Assert.IsTrue(Bytes.SequenceEqual(CryptoBytes.FromHexString(HexStringLower)));
+            Assert.IsTrue(_bytes.SequenceEqual(CryptoBytes.FromHexString(HexStringLower)));
         }
 
         [TestMethod]
         public void ToBase64String()
         {
-            Assert.AreEqual(Base64String, CryptoBytes.ToBase64String(Bytes));
+            Assert.AreEqual(Base64String, CryptoBytes.ToBase64String(_bytes));
         }
 
         [TestMethod]
         public void FromBase64String()
         {
-            Assert.IsTrue(Bytes.SequenceEqual(CryptoBytes.FromBase64String(Base64String)));
+            Assert.IsTrue(_bytes.SequenceEqual(CryptoBytes.FromBase64String(Base64String)));
         }
 
         [TestMethod]
         public void Wipe()
         {
-            var bytes = (byte[])Bytes.Clone();
+            var bytes = (byte[])_bytes.Clone();
             CryptoBytes.Wipe(bytes);
             Assert.IsTrue(bytes.All(b => b == 0));
         }
@@ -118,7 +119,7 @@ namespace Chaos.NaCl.Tests
             var bytes = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
             var wipedBytes = new byte[] { 1, 2, 0, 0, 0, 0, 0, 8, 9, 10 };
             CryptoBytes.Wipe(bytes, 2, 5);
-            Assert.IsTrue(bytes.SequenceEqual(wipedBytes));
+            TestHelpers.AssertEqualBytes(wipedBytes, bytes);
         }
 
         [TestMethod]
@@ -127,7 +128,7 @@ namespace Chaos.NaCl.Tests
             var bytes = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
             var wipedBytes = new byte[] { 1, 2, 0, 0, 0, 0, 0, 8, 9, 10 };
             CryptoBytes.Wipe(new ArraySegment<byte>(bytes, 2, 5));
-            Assert.IsTrue(bytes.SequenceEqual(wipedBytes));
+            TestHelpers.AssertEqualBytes(wipedBytes, bytes);
         }
     }
 }

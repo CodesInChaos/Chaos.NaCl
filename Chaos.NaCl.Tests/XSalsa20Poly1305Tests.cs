@@ -8,20 +8,22 @@ namespace Chaos.NaCl.Tests
     [TestClass]
     public class XSalsa20Poly1305Tests
     {
-        byte[] key = new byte[32]
+        readonly byte[] _key = new byte[32]
                 {
                     0x1b, 0x27, 0x55, 0x64, 0x73, 0xe9, 0x85, 0xd4
                     , 0x62, 0xcd, 0x51, 0x19, 0x7a, 0x9a, 0x46, 0xc7
                     , 0x60, 0x09, 0x54, 0x9e, 0xac, 0x64, 0x74, 0xf2
                     , 0x06, 0xc4, 0xee, 0x08, 0x44, 0xf6, 0x83, 0x89
                 };
-        byte[] nonce = new byte[24]
+
+        readonly byte[] _nonce = new byte[24]
                 {
                     0x69, 0x69, 0x6e, 0xe9, 0x55, 0xb6, 0x2b, 0x73
                     , 0xcd, 0x62, 0xbd, 0xa8, 0x75, 0xfc, 0x73, 0xd6
                     , 0x82, 0x19, 0xe0, 0x03, 0x6b, 0x7a, 0x0b, 0x37
                 };
-        byte[] plaintext = new byte[131]
+
+        readonly byte[] _plaintext = new byte[131]
                 {
                     0xbe, 0x07, 0x5f, 0xc5, 0x3c, 0x81, 0xf2, 0xd5
                     , 0xcf, 0x14, 0x13, 0x16, 0xeb, 0xeb, 0x0c, 0x7b
@@ -41,7 +43,8 @@ namespace Chaos.NaCl.Tests
                     , 0xe0, 0x82, 0xf9, 0x37, 0x76, 0x38, 0x48, 0x64
                     , 0x5e, 0x07, 0x05
                 };
-        byte[] ciphertext = new byte[147]
+
+        readonly byte[] _ciphertext = new byte[147]
                 {
                     0xf3, 0xff, 0xc7, 0x70, 0x3f, 0x94, 0x00, 0xe5
                     , 0x2a, 0x7d, 0xfb, 0x4b, 0x3d, 0x33, 0x05, 0xd9
@@ -67,27 +70,61 @@ namespace Chaos.NaCl.Tests
         [TestMethod]
         public void Encrypt()
         {
-            var ciphertextActual = XSalsa20Poly1305.Encrypt(plaintext, key, nonce);
-            Assert.AreEqual(BitConverter.ToString(ciphertext), BitConverter.ToString(ciphertextActual));
+            var ciphertextActual = XSalsa20Poly1305.Encrypt(_plaintext, _key, _nonce);
+            Assert.AreEqual(BitConverter.ToString(_ciphertext), BitConverter.ToString(ciphertextActual));
+        }
+
+        [TestMethod]
+        public void EncryptSegments()
+        {
+            var ciphertextActual = new byte[_plaintext.Length + XSalsa20Poly1305.MacSizeInBytes].Pad();
+            XSalsa20Poly1305.Encrypt(ciphertextActual, _plaintext.Pad(), _key.Pad(), _nonce.Pad());
+            Assert.AreEqual(BitConverter.ToString(_ciphertext), BitConverter.ToString(ciphertextActual.ToArray()));
         }
 
         [TestMethod]
         public void DecryptSuccess()
         {
-            var plaintextActual = XSalsa20Poly1305.TryDecrypt(ciphertext, key, nonce);
-            Assert.AreEqual(BitConverter.ToString(plaintext), BitConverter.ToString(plaintextActual));
+            var plaintextActual = XSalsa20Poly1305.TryDecrypt(_ciphertext, _key, _nonce);
+            Assert.AreEqual(BitConverter.ToString(_plaintext), BitConverter.ToString(plaintextActual));
+        }
+
+        [TestMethod]
+        public void DecryptSuccessSegments()
+        {
+            var plaintextActual = new byte[_ciphertext.Length - XSalsa20Poly1305.MacSizeInBytes].Pad();
+            var success = XSalsa20Poly1305.TryDecrypt(plaintextActual, _ciphertext.Pad(), _key.Pad(), _nonce.Pad());
+            Assert.IsTrue(success);
+            Assert.AreEqual(BitConverter.ToString(_plaintext), BitConverter.ToString(plaintextActual.ToArray()));
         }
 
         [TestMethod]
         public void DecryptFail()
         {
-            for (int i = 0; i < ciphertext.Length; i++)
+            foreach (var brokenCiphertext in _ciphertext.WithChangedBit())
             {
-                var brokenCiphertext = ciphertext.ToArray();
-                brokenCiphertext[i] ^= 1;
-                var plaintextActual = XSalsa20Poly1305.TryDecrypt(brokenCiphertext, key, nonce);
+                var plaintextActual = XSalsa20Poly1305.TryDecrypt(brokenCiphertext, _key, _nonce);
                 Assert.AreEqual(null, plaintextActual);
             }
+        }
+
+        [TestMethod]
+        public void DecryptFailSegments()
+        {
+            foreach (var brokenCiphertext in _ciphertext.WithChangedBit())
+            {
+                var plaintextActual = new byte[_ciphertext.Length - XSalsa20Poly1305.MacSizeInBytes].Pad();
+                var success = XSalsa20Poly1305.TryDecrypt(plaintextActual, brokenCiphertext.Pad(), _key.Pad(), _nonce.Pad());
+                Assert.IsFalse(success);
+                TestHelpers.AssertEqualBytes(new byte[_plaintext.Length], plaintextActual.ToArray());
+            }
+        }
+
+        [TestMethod]
+        public void DecryptTooShort()
+        {
+            var plaintextActual = XSalsa20Poly1305.TryDecrypt(new byte[15], _key, _nonce);
+            Assert.AreEqual(null, plaintextActual);
         }
     }
 }

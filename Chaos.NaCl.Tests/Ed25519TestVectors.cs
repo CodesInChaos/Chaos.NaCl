@@ -3,23 +3,11 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using System.Text;
 
 namespace Chaos.NaCl.Tests
 {
 	public class Ed25519TestVectors
 	{
-
-		private static byte[] ParseHex(string hex)
-		{
-			var result = new byte[hex.Length / 2];
-			for (int i = 0; i < result.Length; i++)
-			{
-				result[i] = Convert.ToByte(hex.Substring(i * 2, 2), 16);
-			}
-			return result;
-		}
-
 		public class TestTuple
 		{
 			public byte[] PrivateKey { get; private set; }
@@ -31,7 +19,7 @@ namespace Chaos.NaCl.Tests
 
 			public TestTuple(string line)
 			{
-				byte[][] testCase = line.Split(':').Select(part => ParseHex(part)).ToArray();
+                byte[][] testCase = line.Split(':').Select(CryptoBytes.FromHexString).ToArray();
 				Contract.Assert(5 == testCase.Length);
 				PrivateKey = testCase[0];
 				Seed = PrivateKey.Take(32).ToArray();
@@ -51,7 +39,7 @@ namespace Chaos.NaCl.Tests
 			var lines = RawTestCaseFile
 				.Replace(" ", "")
 				.Replace("\t", "")
-				.Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+				.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
 			return lines.Select(line => new TestTuple(line)).ToArray();
 		}
 

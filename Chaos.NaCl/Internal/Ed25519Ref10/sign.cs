@@ -39,26 +39,6 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
 			Array.Copy(sm32, 0, sm, 32, 32);
 		}*/
 
-		//ToDo: Remove
-		/*internal class DummyHasher : HashAlgorithm
-		{
-			protected override void HashCore(byte[] array, int ibStart, int cbSize)
-			{
-			}
-
-			protected override byte[] HashFinal()
-			{
-				var result = new byte[64];
-				for (int i = 0; i < result.Length; i++)
-					result[i] = (byte)i;
-				return result;
-			}
-
-			public override void Initialize()
-			{
-			}
-		}*/
-
 		public static void crypto_sign2(
 			byte[] sig, int sigoffset,
 			byte[] m, int moffset, int mlen,
@@ -68,29 +48,31 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
 			byte[] r;
 			byte[] hram;
 			GroupElementP3 R;
-			using (var hasher = new Sha512BclWrapper())
+		    var hasher = new Sha512();
 			{
-				az = hasher.ComputeHash(sk, skoffset, 32);
+                hasher.Update(sk, skoffset, 32);
+			    az = hasher.Finish();
 				az[0] &= 248;
 				az[31] &= 63;
 				az[31] |= 64;
 
-				hasher.TransformBlock(az, 32, 32, null, 0);
-				hasher.TransformFinalBlock(m, moffset, mlen);
-				r = hasher.Hash;
+			    hasher.Init();
+				hasher.Update(az, 32, 32);
+				hasher.Update(m, moffset, mlen);
+				r = hasher.Finish();
 
 				ScalarOperations.sc_reduce(r);
 				GroupOperations.ge_scalarmult_base(out R, r, 0);
 				GroupOperations.ge_p3_tobytes(sig, sigoffset, ref R);
 
-				hasher.Initialize();
-				hasher.TransformBlock(sig, sigoffset, 32, null, 0);
-				hasher.TransformBlock(sk, skoffset + 32, 32, null, 0);
-				hasher.TransformFinalBlock(m, moffset, mlen);
-				hram = hasher.Hash;
+				hasher.Init();
+				hasher.Update(sig, sigoffset, 32);
+				hasher.Update(sk, skoffset + 32, 32);
+				hasher.Update(m, moffset, mlen);
+				hram = hasher.Finish();
 
 				ScalarOperations.sc_reduce(hram);
-				var s = new byte[32];
+				var s = new byte[32];//todo: remove allocation
 				Array.Copy(sig, sigoffset + 32, s, 0, 32);
 				ScalarOperations.sc_muladd(s, hram, az, r);
 				Array.Copy(s, 0, sig, sigoffset + 32, 32);

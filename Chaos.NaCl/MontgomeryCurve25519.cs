@@ -43,11 +43,26 @@ namespace Chaos.NaCl
                 throw new ArgumentException("privateKey.Count must be 32");
             if (privateKey.Count != PrivateKeySizeInBytes)
                 throw new ArgumentException("privateKey.Count must be 32");
-            MontgomeryOperations.scalarmult(publicKey.Array, publicKey.Offset, privateKey.Array, privateKey.Offset, _basePoint, 0);
+
+            // hack: abusing publicKey as temporary storage
+            // todo: remove hack
+            for (int i = 0; i < 32; i++)
+            {
+                publicKey.Array[publicKey.Offset + i] = privateKey.Array[privateKey.Offset + i];
+            }
+            publicKey.Array[publicKey.Offset + 0] &= 248;
+            publicKey.Array[publicKey.Offset + 31] &= 63;
+            publicKey.Array[publicKey.Offset + 31] |= 64;
+
+            GroupElementP3 A;
+            GroupOperations.ge_scalarmult_base(out A, publicKey.Array, publicKey.Offset);
+            FieldElement publicKeyFE;
+            EdwardsToMontgomeryX(out publicKeyFE, ref A.Y, ref A.Z);
+            FieldOperations.fe_tobytes(publicKey.Array, publicKey.Offset, ref publicKeyFE);
         }
 
         // hashes like the Curve25519 paper says
-        private static void KeyExchangeOutputHashCurve25519Paper(byte[] sharedKey, int offset)
+        internal static void KeyExchangeOutputHashCurve25519Paper(byte[] sharedKey, int offset)
         {
             //c = Curve25519output
             const UInt32 c0 = 'C' | 'u' << 8 | 'r' << 16 | (UInt32)'v' << 24;

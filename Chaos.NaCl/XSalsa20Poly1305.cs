@@ -23,8 +23,29 @@ namespace Chaos.NaCl
             return ciphertext;
         }
 
+        public static void Encrypt(ArraySegment<byte> ciphertext, ArraySegment<byte> message, ArraySegment<byte> key, ArraySegment<byte> nonce)
+        {
+            if (key.Count != KeySizeInBytes)
+                throw new ArgumentException("key.Length != 32");
+            if (nonce.Count != NonceSizeInBytes)
+                throw new ArgumentException("nonce.Length != 24");
+            if (ciphertext.Count != message.Count + MacSizeInBytes)
+                throw new ArgumentException("ciphertext.Count != message.Count + 16");
+            EncryptInternal(ciphertext.Array, ciphertext.Offset, message.Array, message.Offset, message.Count, key.Array, key.Offset, nonce.Array, nonce.Offset);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>Plaintext if MAC validation succeeds, null if the data is invalid.</returns>
         public static byte[] TryDecrypt(byte[] ciphertext, byte[] key, byte[] nonce)
         {
+            if (ciphertext == null)
+                throw new ArgumentNullException("ciphertext");
+            if (key == null)
+                throw new ArgumentNullException("key");
+            if (nonce == null)
+                throw new ArgumentNullException("nonce");
             if (key.Length != KeySizeInBytes)
                 throw new ArgumentException("key.Length != 32");
             if (nonce.Length != NonceSizeInBytes)
@@ -38,6 +59,18 @@ namespace Chaos.NaCl
                 return plaintext;
             else
                 return null;
+        }
+
+        public static bool TryDecrypt(ArraySegment<byte> message, ArraySegment<byte> ciphertext, ArraySegment<byte> key, ArraySegment<byte> nonce)
+        {
+            if (key.Count != KeySizeInBytes)
+                throw new ArgumentException("key.Length != 32");
+            if (nonce.Count != NonceSizeInBytes)
+                throw new ArgumentException("nonce.Length != 24");
+            if (ciphertext.Count != message.Count + MacSizeInBytes)
+                throw new ArgumentException("ciphertext.Count != message.Count + 16");
+
+            return DecryptInternal(message.Array, message.Offset, ciphertext.Array, ciphertext.Offset, ciphertext.Count, key.Array, key.Offset, nonce.Array, nonce.Offset);
         }
 
         private static void PrepareInternalKey(out Array16<UInt32> internalKey, byte[] key, int keyOffset, byte[] nonce, int nonceOffset)
@@ -90,13 +123,13 @@ namespace Chaos.NaCl
 
             Array16<UInt32> temp;
             var tempBytes = new byte[64];//todo: remove allocation
-            Array8<UInt32> poly1305Key;
 
             // first iteration
             {
                 SalsaCore.Salsa(out temp, ref internalKey, 20);
 
                 //first half is for Poly1305
+                Array8<UInt32> poly1305Key;
                 poly1305Key.x0 = temp.x0;
                 poly1305Key.x1 = temp.x1;
                 poly1305Key.x2 = temp.x2;
@@ -131,7 +164,7 @@ namespace Chaos.NaCl
             {
                 internalKey.x8++;
                 SalsaCore.Salsa(out temp, ref internalKey, 20);
-                Array16<UInt32>.ToBytesLittleEndian(tempBytes, 0, ref temp);
+                ByteIntegerConverter.Array16StoreLittleEndian32(tempBytes, 0, ref temp);
                 int count = Math.Min(64, plaintextLength - blockOffset);
                 for (int i = 0; i < count; i++)
                     plaintext[plaintextOffset + blockOffset + i] = (byte)(ciphertext[16 + ciphertextOffset + blockOffset + i] ^ tempBytes[i]);
@@ -163,7 +196,7 @@ namespace Chaos.NaCl
                 poly1305Key.x6 = temp.x6;
                 poly1305Key.x7 = temp.x7;
 
-                // rest for the message
+                // second half for the message
                 ByteIntegerConverter.StoreLittleEndian32(tempBytes, 0, temp.x8);
                 ByteIntegerConverter.StoreLittleEndian32(tempBytes, 4, temp.x9);
                 ByteIntegerConverter.StoreLittleEndian32(tempBytes, 8, temp.x10);
@@ -183,7 +216,7 @@ namespace Chaos.NaCl
             {
                 internalKey.x8++;
                 SalsaCore.Salsa(out temp, ref internalKey, 20);
-                Array16<UInt32>.ToBytesLittleEndian(tempBytes, 0, ref temp);
+                ByteIntegerConverter.Array16StoreLittleEndian32(tempBytes, 0, ref temp);
                 int count = Math.Min(64, messageLength - blockOffset);
                 for (int i = 0; i < count; i++)
                     ciphertext[16 + ciphertextOffset + blockOffset + i] = (byte)(message[messageOffset + blockOffset + i] ^ tempBytes[i]);

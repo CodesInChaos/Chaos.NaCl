@@ -1,4 +1,6 @@
-﻿namespace Chaos.NaCl.Internal
+﻿using System;
+
+namespace Chaos.NaCl.Internal
 {
     internal struct Array8<T>
     {

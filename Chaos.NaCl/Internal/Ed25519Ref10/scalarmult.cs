@@ -21,7 +21,7 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
 			byte[] n, int noffset,
 			ref FieldElement p)
 		{
-			byte[] e = new byte[32];//ToDo: eliminate alloc
+			byte[] e = new byte[32];//ToDo: remove allocation
 			UInt32 i;
 			FieldElement x1;
 			FieldElement x2;

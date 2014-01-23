@@ -21,11 +21,11 @@ namespace Chaos.NaCl.Tests
 		[TestMethod]
 		public void KeyPairFromSeed()
 		{
-			byte[] publicKey;
-			byte[] privateKey;
-			foreach (var testCase in Ed25519TestVectors.TestCases)
+		    foreach (var testCase in Ed25519TestVectors.TestCases)
 			{
-				Ed25519.KeyPairFromSeed(out publicKey, out privateKey, testCase.Seed);
+			    byte[] publicKey;
+			    byte[] privateKey;
+			    Ed25519.KeyPairFromSeed(out publicKey, out privateKey, testCase.Seed);
 				Assert.AreEqual(BitConverter.ToString(testCase.PublicKey), BitConverter.ToString(publicKey));
 				Assert.AreEqual(BitConverter.ToString(testCase.PrivateKey), BitConverter.ToString(privateKey));
 			}
@@ -34,7 +34,6 @@ namespace Chaos.NaCl.Tests
 		[TestMethod]
 		public void Sign()
 		{
-			//Assert.AreEqual(8, IntPtr.Size);
 			foreach (var testCase in Ed25519TestVectors.TestCases)
 			{
 				var sig = Ed25519.Sign(testCase.Message, testCase.PrivateKey);
@@ -60,14 +59,45 @@ namespace Chaos.NaCl.Tests
 			byte[] pk;
 			byte[] sk;
 			Ed25519.KeyPairFromSeed(out pk, out sk, new byte[32]);
-			var sig = Ed25519.Sign(message, sk);
-			Assert.IsTrue(Ed25519.Verify(sig, message, pk));
-			message[0] = 1;
-			Assert.IsFalse(Ed25519.Verify(sig, message, pk));
-			message[0] = 0;
-			Assert.IsTrue(Ed25519.Verify(sig, message, pk));
-			message[99] = 0;
-			Assert.IsFalse(Ed25519.Verify(sig, message, pk));
+			var signature = Ed25519.Sign(message, sk);
+			Assert.IsTrue(Ed25519.Verify(signature, message, pk));
+		    foreach (var modifiedMessage in message.WithChangedBit())
+		    {
+                Assert.IsFalse(Ed25519.Verify(signature, modifiedMessage, pk));
+		    }
+		    foreach (var modifiedSignature in signature.WithChangedBit())
+		    {
+                Assert.IsFalse(Ed25519.Verify(modifiedSignature, message, pk));   
+		    }
 		}
+
+        [TestMethod]
+        public void VerifySegments()
+        {
+            foreach (var testCase in Ed25519TestVectors.TestCases)
+            {
+                bool success = Ed25519.Verify(testCase.Signature.Pad(), testCase.Message.Pad(), testCase.PublicKey.Pad());
+                Assert.IsTrue(success);
+            }
+        }
+
+        [TestMethod]
+        public void VerifyFailSegments()
+        {
+            var message = Enumerable.Range(0, 100).Select(i => (byte)i).ToArray();
+            byte[] pk;
+            byte[] sk;
+            Ed25519.KeyPairFromSeed(out pk, out sk, new byte[32]);
+            var signature = Ed25519.Sign(message, sk);
+            Assert.IsTrue(Ed25519.Verify(signature.Pad(), message.Pad(), pk.Pad()));
+            foreach (var modifiedMessage in message.WithChangedBit())
+            {
+                Assert.IsFalse(Ed25519.Verify(signature.Pad(), modifiedMessage.Pad(), pk.Pad()));
+            }
+            foreach (var modifiedSignature in signature.WithChangedBit())
+            {
+                Assert.IsFalse(Ed25519.Verify(modifiedSignature.Pad(), message.Pad(), pk.Pad()));
+            }
+        }
 	}
 }

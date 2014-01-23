@@ -5,7 +5,8 @@ namespace Chaos.NaCl.Internal
 {
     internal class Poly1305Donna
     {
-        // written by floodyberry
+        // written by floodyberry (Andrew M.)
+        // original license: MIT or PUBLIC DOMAIN
         // https://github.com/floodyberry/poly1305-donna/blob/master/poly1305-donna-unrolled.c
         public static void poly1305_auth(byte[] output, int outputOffset, byte[] m, int mStart, int mLength, ref Array8<UInt32> key)
         {
@@ -15,11 +16,10 @@ namespace Chaos.NaCl.Internal
             UInt32 s1, s2, s3, s4;
             UInt32 b, nb;
             int j;
-            UInt64[] t = new UInt64[5];//todo remove allocation
+            UInt64 tt0, tt1, tt2, tt3, tt4;
             UInt64 f0, f1, f2, f3;
             UInt32 g0, g1, g2, g3, g4;
             UInt64 c;
-            byte[] mp = new byte[16];//todo remove allocation
 
             /* clamp key */
             t0 = key.x0;
@@ -67,17 +67,17 @@ namespace Chaos.NaCl.Internal
 
 
         poly1305_donna_mul:
-            t[0] = (ulong)h0 * r0 + (ulong)h1 * s4 + (ulong)h2 * s3 + (ulong)h3 * s2 + (ulong)h4 * s1;
-            t[1] = (ulong)h0 * r1 + (ulong)h1 * r0 + (ulong)h2 * s4 + (ulong)h3 * s3 + (ulong)h4 * s2;
-            t[2] = (ulong)h0 * r2 + (ulong)h1 * r1 + (ulong)h2 * r0 + (ulong)h3 * s4 + (ulong)h4 * s3;
-            t[3] = (ulong)h0 * r3 + (ulong)h1 * r2 + (ulong)h2 * r1 + (ulong)h3 * r0 + (ulong)h4 * s4;
-            t[4] = (ulong)h0 * r4 + (ulong)h1 * r3 + (ulong)h2 * r2 + (ulong)h3 * r1 + (ulong)h4 * r0;
+            tt0 = (ulong)h0 * r0 + (ulong)h1 * s4 + (ulong)h2 * s3 + (ulong)h3 * s2 + (ulong)h4 * s1;
+            tt1 = (ulong)h0 * r1 + (ulong)h1 * r0 + (ulong)h2 * s4 + (ulong)h3 * s3 + (ulong)h4 * s2;
+            tt2 = (ulong)h0 * r2 + (ulong)h1 * r1 + (ulong)h2 * r0 + (ulong)h3 * s4 + (ulong)h4 * s3;
+            tt3 = (ulong)h0 * r3 + (ulong)h1 * r2 + (ulong)h2 * r1 + (ulong)h3 * r0 + (ulong)h4 * s4;
+            tt4 = (ulong)h0 * r4 + (ulong)h1 * r3 + (ulong)h2 * r2 + (ulong)h3 * r1 + (ulong)h4 * r0;
 
-            h0 = (UInt32)t[0] & 0x3ffffff; c = (t[0] >> 26);
-            t[1] += c; h1 = (UInt32)t[1] & 0x3ffffff; b = (UInt32)(t[1] >> 26);
-            t[2] += b; h2 = (UInt32)t[2] & 0x3ffffff; b = (UInt32)(t[2] >> 26);
-            t[3] += b; h3 = (UInt32)t[3] & 0x3ffffff; b = (UInt32)(t[3] >> 26);
-            t[4] += b; h4 = (UInt32)t[4] & 0x3ffffff; b = (UInt32)(t[4] >> 26);
+            h0 = (UInt32)tt0 & 0x3ffffff; c = (tt0 >> 26);
+            tt1 += c; h1 = (UInt32)tt1 & 0x3ffffff; b = (UInt32)(tt1 >> 26);
+            tt2 += b; h2 = (UInt32)tt2 & 0x3ffffff; b = (UInt32)(tt2 >> 26);
+            tt3 += b; h3 = (UInt32)tt3 & 0x3ffffff; b = (UInt32)(tt3 >> 26);
+            tt4 += b; h4 = (UInt32)tt4 & 0x3ffffff; b = (UInt32)(tt4 >> 26);
             h0 += b * 5;
 
             if (mLength >= 16)
@@ -87,6 +87,8 @@ namespace Chaos.NaCl.Internal
         poly1305_donna_atmost15bytes:
             if (mLength == 0)
                 goto poly1305_donna_finish;
+
+            byte[] mp = new byte[16];//todo remove allocation
 
             for (j = 0; j < mLength; j++)
                 mp[j] = m[mStart + j];
@@ -99,6 +101,7 @@ namespace Chaos.NaCl.Internal
             t1 = ByteIntegerConverter.LoadLittleEndian32(mp, 4);
             t2 = ByteIntegerConverter.LoadLittleEndian32(mp, 8);
             t3 = ByteIntegerConverter.LoadLittleEndian32(mp, 12);
+            CryptoBytes.Wipe(mp);
 
             h0 += t0 & 0x3ffffff;
             h1 += (uint)(((((UInt64)t1 << 32) | t0) >> 26) & 0x3ffffff);

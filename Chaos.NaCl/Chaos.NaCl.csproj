@@ -33,15 +33,21 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Internal\Array32.cs" />
+    <Compile Include="Internal\Array64.cs" />
     <Compile Include="Internal\Array8.cs" />
+    <Compile Include="Internal\ArrayCache.cs" />
     <Compile Include="Internal\ByteIntegerConverter.cs" />
     <Compile Include="CryptoBytes.cs" />
     <Compile Include="Internal\Ed25519Ref10\fe_cswap.cs" />
     <Compile Include="Internal\Ed25519Ref10\fe_mul121666.cs" />
     <Compile Include="Internal\Ed25519Ref10\scalarmult.cs" />
     <Compile Include="Internal\Poly1305Donna.cs" />
-    <Compile Include="Internal\Sha512BclWrapper.cs" />
+    <Compile Include="Internal\Sha512Internal.cs" />
     <Compile Include="MontgomeryCurve25519.cs" />
     <Compile Include="Ed25519.cs" />
     <Compile Include="Internal\Ed25519Ref10\base.cs" />
@@ -83,17 +89,20 @@
     <Compile Include="Internal\Ed25519Ref10\ge_sub.cs" />
     <Compile Include="Internal\Ed25519Ref10\ge_tobytes.cs" />
     <Compile Include="Internal\Ed25519Ref10\GroupElement.cs" />
-    <Compile Include="Internal\Ed25519Ref10\Helpers.cs" />
     <Compile Include="Internal\Ed25519Ref10\keypair.cs" />
     <Compile Include="Internal\Ed25519Ref10\open.cs" />
     <Compile Include="Internal\Ed25519Ref10\sc_mul_add.cs" />
     <Compile Include="Internal\Ed25519Ref10\sc_reduce.cs" />
     <Compile Include="Internal\Ed25519Ref10\sign.cs" />
     <Compile Include="Internal\Ed25519Ref10\sqrtm1.cs" />
+    <Compile Include="OneTimeAuth.cs" />
+    <Compile Include="Poly1305.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Internal\Array16.cs" />
     <Compile Include="Internal\Salsa\Salsa20.cs" />
     <Compile Include="Internal\Salsa\SalsaCore.cs" />
+    <Compile Include="Properties\AssemblyInfoFull.cs" />
+    <Compile Include="Sha512.cs" />
     <Compile Include="XSalsa20Poly1305.cs" />
   </ItemGroup>
   <ItemGroup>
