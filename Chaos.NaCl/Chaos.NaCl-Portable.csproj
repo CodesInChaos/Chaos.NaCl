@@ -85,7 +85,6 @@
     <Compile Include="Internal\Ed25519Ref10\ge_sub.cs" />
     <Compile Include="Internal\Ed25519Ref10\ge_tobytes.cs" />
     <Compile Include="Internal\Ed25519Ref10\GroupElement.cs" />
-    <Compile Include="Internal\Ed25519Ref10\Helpers.cs" />
     <Compile Include="Internal\Ed25519Ref10\keypair.cs" />
     <Compile Include="Internal\Ed25519Ref10\open.cs" />
     <Compile Include="Internal\Ed25519Ref10\scalarmult.cs" />
