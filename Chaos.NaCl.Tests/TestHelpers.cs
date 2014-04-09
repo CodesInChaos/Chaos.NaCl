@@ -23,11 +23,6 @@ namespace Chaos.NaCl.Tests
             Assert.AreEqual(BitConverter.ToString(expected), BitConverter.ToString(actual));
         }
 
-        /*public static void AssertEqualBytes(ArraySegment<byte> expected, ArraySegment<byte> actual)
-        {
-            AssertEqualBytes(expected.ToArray(), actual.ToArray());
-        }*/
-
         public static ArraySegment<byte> Pad(this byte[] array)
         {
             return array.Pad(Random(1, 100), Random(0, 50));
@@ -35,20 +30,34 @@ namespace Chaos.NaCl.Tests
 
         private static ArraySegment<byte> Pad(this byte[] array, int paddingLeft, int paddingRight)
         {
-            byte padByteLeft;
-            byte padByteRight;
+            byte padByte = 0xE7;
             if (array.Length > 0)
             {
-                padByteLeft = (byte)~array[0];
-                padByteRight = (byte)~array[array.Length - 1];
+                if (array[0] == padByte)
+                    padByte++;
+                if (array[array.Length - 1] == padByte)
+                    padByte++;
             }
-            else
-            {
-                padByteLeft = 0xE7;
-                padByteRight = 0xE7;
-            }
-            var resultBytes = Enumerable.Repeat(padByteLeft, paddingLeft).Concat(array).Concat(Enumerable.Repeat(padByteRight, paddingRight)).ToArray();
+            var resultBytes = Enumerable.Repeat(padByte, paddingLeft).Concat(array).Concat(Enumerable.Repeat(padByte, paddingRight)).ToArray();
             return new ArraySegment<byte>(resultBytes, paddingLeft, array.Length);
+        }
+
+        public static byte[] UnPad(this ArraySegment<byte> paddedData)
+        {
+            byte padByte = paddedData.Array[0];
+            if (padByte < 0xE7 || padByte > 0xE9)
+                throw new ArgumentException("Padding invalid");
+            for (int i = 0; i < paddedData.Offset; i++)
+            {
+                if (paddedData.Array[i] != padByte)
+                    throw new ArgumentException("Padding invalid");
+            }
+            for (int i = paddedData.Offset + paddedData.Count; i < paddedData.Array.Length; i++)
+            {
+                if (paddedData.Array[i] != padByte)
+                    throw new ArgumentException("Padding invalid");
+            }
+            return paddedData.ToArray();
         }
 
         public static IEnumerable<byte[]> WithChangedBit(this byte[] array)
@@ -62,7 +71,7 @@ namespace Chaos.NaCl.Tests
                 }
         }
 
-        public static byte[] ToArray(this ArraySegment<byte> segment)
+        private static byte[] ToArray(this ArraySegment<byte> segment)
         {
             var result = new byte[segment.Count];
             Array.Copy(segment.Array, segment.Offset, result, 0, segment.Count);

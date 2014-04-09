@@ -31,7 +31,7 @@ namespace Chaos.NaCl.Tests
                 var message = Enumerable.Range(1, n).Select(i => (byte)i).ToArray();
                 var hashExpected = sha512Framework.ComputeHash(message);
                 var hash = Sha512.Hash(message);
-                Assert.AreEqual(BitConverter.ToString(hashExpected), BitConverter.ToString(hash));
+                TestHelpers.AssertEqualBytes(hashExpected, hash);
             }
         }
 
@@ -44,7 +44,7 @@ namespace Chaos.NaCl.Tests
                 var message = Enumerable.Range(1, n).Select(i => (byte)i).ToArray();
                 var hashExpected = sha512Framework.ComputeHash(message);
                 var hash = Sha512.Hash(message);
-                Assert.AreEqual(BitConverter.ToString(hashExpected), BitConverter.ToString(hash));
+                TestHelpers.AssertEqualBytes(hashExpected, hash);
             }
         }
 
@@ -67,7 +67,7 @@ namespace Chaos.NaCl.Tests
                         hasher.Update(message, k, m);
                         hasher.Update(message, k + m, n);
                         var hash = hasher.Finish();
-                        Assert.AreEqual(BitConverter.ToString(hashExpected), BitConverter.ToString(hash));
+                        TestHelpers.AssertEqualBytes(hashExpected, hash);
                     }
         }
 
@@ -81,12 +81,12 @@ namespace Chaos.NaCl.Tests
             var hasher = new Sha512();
             hasher.Update(message, 0, message.Length);
             var hash1 = hasher.Finish();
-            Assert.AreEqual(BitConverter.ToString(hashExpected), BitConverter.ToString(hash1));
+            TestHelpers.AssertEqualBytes(hashExpected, hash1);
 
             hasher.Init();
             hasher.Update(message, 0, message.Length);
             var hash2 = hasher.Finish();
-            Assert.AreEqual(BitConverter.ToString(hashExpected), BitConverter.ToString(hash2));
+            TestHelpers.AssertEqualBytes(hashExpected, hash2);
         }
 
         [TestMethod]
@@ -105,7 +105,7 @@ namespace Chaos.NaCl.Tests
             var message = new[] { (byte)'a', (byte)'b', (byte)'c' };
             var hashExpected = _sha512HashAbc;
             var hash = Sha512.Hash(message);
-            Assert.AreEqual(BitConverter.ToString(hashExpected), BitConverter.ToString(hash));
+            TestHelpers.AssertEqualBytes(hashExpected, hash);
         }
 
         [TestMethod]
@@ -117,7 +117,7 @@ namespace Chaos.NaCl.Tests
             sha512.Update(message, 0, message.Length);
             var output = new byte[64].Pad();
             sha512.Finish(output);
-            Assert.AreEqual(BitConverter.ToString(hashExpected), BitConverter.ToString(output.ToArray()));
+            TestHelpers.AssertEqualBytes(hashExpected, output.UnPad());
         }
 
         [TestMethod]

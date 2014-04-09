@@ -79,7 +79,7 @@ namespace Chaos.NaCl.Tests
 			SalsaCore.Salsa(out outputState, ref inputState, 20);
 			ByteIntegerConverter.Array16StoreLittleEndian32(actualOutput, 0, ref outputState);
 
-			Assert.AreEqual(BitConverter.ToString(expectedOutput), BitConverter.ToString(actualOutput));
+		    TestHelpers.AssertEqualBytes(expectedOutput, actualOutput);
 		}
 
 		[TestMethod]
@@ -104,7 +104,7 @@ namespace Chaos.NaCl.Tests
 			}
 			ByteIntegerConverter.Array16StoreLittleEndian32(actualOutput, 0, ref state);
 
-			Assert.AreEqual(BitConverter.ToString(expectedOutput), BitConverter.ToString(actualOutput));
+			TestHelpers.AssertEqualBytes(expectedOutput, actualOutput);
 		}
 	}
 }

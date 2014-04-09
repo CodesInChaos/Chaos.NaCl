@@ -28,8 +28,8 @@ namespace Chaos.NaCl.Tests
                 byte[] publicKey;
                 byte[] privateKey;
                 Ed25519.KeyPairFromSeed(out publicKey, out privateKey, testCase.Seed);
-                Assert.AreEqual(BitConverter.ToString(testCase.PublicKey), BitConverter.ToString(publicKey));
-                Assert.AreEqual(BitConverter.ToString(testCase.PrivateKey), BitConverter.ToString(privateKey));
+                TestHelpers.AssertEqualBytes(testCase.PublicKey, publicKey);
+                TestHelpers.AssertEqualBytes(testCase.PrivateKey, privateKey);
             }
         }
 
@@ -42,8 +42,8 @@ namespace Chaos.NaCl.Tests
                 var publicKey = new byte[Ed25519.PublicKeySizeInBytes].Pad();
                 var privateKey = new byte[Ed25519.ExpandedPrivateKeySizeInBytes].Pad();
                 Ed25519.KeyPairFromSeed(publicKey, privateKey, testCase.Seed.Pad());
-                TestHelpers.AssertEqualBytes(testCase.PublicKey, publicKey.ToArray());
-                TestHelpers.AssertEqualBytes(testCase.PrivateKey, privateKey.ToArray());
+                TestHelpers.AssertEqualBytes(testCase.PublicKey, publicKey.UnPad());
+                TestHelpers.AssertEqualBytes(testCase.PrivateKey, privateKey.UnPad());
             }
         }
 
@@ -54,7 +54,7 @@ namespace Chaos.NaCl.Tests
             {
                 var sig = Ed25519.Sign(testCase.Message, testCase.PrivateKey);
                 Assert.AreEqual(64, sig.Length);
-                Assert.AreEqual(BitConverter.ToString(testCase.Signature), BitConverter.ToString(sig));
+                TestHelpers.AssertEqualBytes(testCase.Signature, sig);
             }
         }
 
