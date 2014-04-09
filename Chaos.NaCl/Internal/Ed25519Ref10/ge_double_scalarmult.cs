@@ -55,6 +55,7 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
 		public static void ge_double_scalarmult_vartime(out GroupElementP2 r, byte[] a, ref GroupElementP3 A, byte[] b)
 		{
 			GroupElementPreComp[] Bi = LookupTables.Base2;
+            // todo: Perhaps remove these allocations?
 			sbyte[] aslide = new sbyte[256];
 			sbyte[] bslide = new sbyte[256];
 			GroupElementCached[] Ai = new GroupElementCached[8]; /* A,3A,5A,7A,9A,11A,13A,15A */

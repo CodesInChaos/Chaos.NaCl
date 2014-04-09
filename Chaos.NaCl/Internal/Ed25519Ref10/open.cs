@@ -51,7 +51,7 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
             byte[] pk, int pkoffset)
         {
             byte[] h;
-            byte[] checkr = new byte[32];//todo: remove allocation
+            byte[] checkr = new byte[32];
             GroupElementP3 A;
             GroupElementP2 R;
 
@@ -71,7 +71,10 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
             Array.Copy(sig, sigoffset + 32, sm32, 0, 32);
             GroupOperations.ge_double_scalarmult_vartime(out R, h, ref A, sm32);
             GroupOperations.ge_tobytes(checkr, 0, ref R);
-            return CryptoBytes.ConstantTimeEquals(checkr, 0, sig, sigoffset, 32);
+            var result = CryptoBytes.ConstantTimeEquals(checkr, 0, sig, sigoffset, 32);
+            CryptoBytes.Wipe(h);
+            CryptoBytes.Wipe(checkr);
+            return result;
         }
     }
 }

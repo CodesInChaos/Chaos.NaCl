@@ -32,20 +32,21 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>default</LangVersion>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Internal\Array32.cs" />
-    <Compile Include="Internal\Array64.cs" />
     <Compile Include="Internal\Array8.cs" />
-    <Compile Include="Internal\ArrayCache.cs" />
     <Compile Include="Internal\ByteIntegerConverter.cs" />
     <Compile Include="CryptoBytes.cs" />
     <Compile Include="Internal\Ed25519Ref10\fe_cswap.cs" />
     <Compile Include="Internal\Ed25519Ref10\fe_mul121666.cs" />
     <Compile Include="Internal\Ed25519Ref10\scalarmult.cs" />
+    <Compile Include="Internal\Ed25519Ref10\sc_clamp.cs" />
+    <Compile Include="Internal\InternalAssert.cs" />
     <Compile Include="Internal\Poly1305Donna.cs" />
     <Compile Include="Internal\Sha512Internal.cs" />
     <Compile Include="MontgomeryCurve25519.cs" />
@@ -104,9 +105,6 @@
     <Compile Include="Properties\AssemblyInfoFull.cs" />
     <Compile Include="Sha512.cs" />
     <Compile Include="XSalsa20Poly1305.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <Reference Include="System" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

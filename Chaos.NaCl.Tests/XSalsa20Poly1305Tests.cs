@@ -114,6 +114,8 @@ namespace Chaos.NaCl.Tests
             foreach (var brokenCiphertext in _ciphertext.WithChangedBit())
             {
                 var plaintextActual = new byte[_ciphertext.Length - XSalsa20Poly1305.MacSizeInBytes].Pad();
+                for (int i = 0; i < plaintextActual.Count; i++)
+                    plaintextActual.Array[plaintextActual.Offset + i] = 0x37;
                 var success = XSalsa20Poly1305.TryDecrypt(plaintextActual, brokenCiphertext.Pad(), _key.Pad(), _nonce.Pad());
                 Assert.IsFalse(success);
                 TestHelpers.AssertEqualBytes(new byte[_plaintext.Length], plaintextActual.ToArray());
@@ -128,7 +130,7 @@ namespace Chaos.NaCl.Tests
         }
 
         [TestMethod]
-        public void RoundTripSuccessWithManyLengthes()
+        public void RoundTripSuccessWithManyLengths()
         {
             for (int length = 0; length < 1000; length++)
             {
@@ -140,7 +142,7 @@ namespace Chaos.NaCl.Tests
         }
 
         [TestMethod]
-        public void RoundTripFailWithManyLengthes()
+        public void RoundTripFailWithManyLengths()
         {
             for (int length = 0; length < 130; length++)//130 bytes exceeds two blocks
             {

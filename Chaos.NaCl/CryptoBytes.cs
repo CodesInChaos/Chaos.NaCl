@@ -5,21 +5,29 @@ namespace Chaos.NaCl
 {
     public static class CryptoBytes
     {
-        [Obsolete("Needs more testing")]
         public static bool ConstantTimeEquals(byte[] x, byte[] y)
         {
-            return ConstantTimeEquals(new ArraySegment<byte>(x), new ArraySegment<byte>(y));
+            if (x == null)
+                throw new ArgumentNullException("x");
+            if (y == null)
+                throw new ArgumentNullException("y");
+            if (x.Length != y.Length)
+                throw new ArgumentException("x.Length must equal y.Length");
+            return InternalConstantTimeEquals(x, 0, y, 0, x.Length) != 0;
         }
 
-        [Obsolete("Needs more testing")]
         public static bool ConstantTimeEquals(ArraySegment<byte> x, ArraySegment<byte> y)
         {
+            if (x.Array == null)
+                throw new ArgumentNullException("x.Array");
+            if (y.Array == null)
+                throw new ArgumentNullException("y.Array");
             if (x.Count != y.Count)
                 throw new ArgumentException("x.Count must equal y.Count");
-            return ConstantTimeEquals(x.Array, x.Offset, y.Array, y.Offset, x.Count);
+
+            return InternalConstantTimeEquals(x.Array, x.Offset, y.Array, y.Offset, x.Count) != 0;
         }
 
-        [Obsolete("Needs more testing")]
         public static bool ConstantTimeEquals(byte[] x, int xOffset, byte[] y, int yOffset, int length)
         {
             if (x == null)
@@ -32,10 +40,10 @@ namespace Chaos.NaCl
                 throw new ArgumentOutOfRangeException("yOffset", "yOffset < 0");
             if (length < 0)
                 throw new ArgumentOutOfRangeException("length", "length < 0");
-            if ((uint)xOffset + (uint)length > (uint)x.Length)
-                throw new ArgumentOutOfRangeException("length", "xOffset + length > x.Length");
-            if ((uint)yOffset + (uint)length > (uint)y.Length)
-                throw new ArgumentOutOfRangeException("length", "yOffset + length > y.Length");
+            if (x.Length - xOffset < length)
+                throw new ArgumentException("xOffset + length > x.Length");
+            if (y.Length - yOffset < length)
+                throw new ArgumentException("yOffset + length > y.Length");
 
             return InternalConstantTimeEquals(x, xOffset, y, yOffset, length) != 0;
         }
@@ -64,7 +72,7 @@ namespace Chaos.NaCl
             if (count < 0)
                 throw new ArgumentOutOfRangeException("count", "Requires count >= 0");
             if ((uint)offset + (uint)count > (uint)data.Length)
-                throw new ArgumentOutOfRangeException("count", "Requires offset + count <= data.Length");
+                throw new ArgumentException("Requires offset + count <= data.Length");
             InternalWipe(data, offset, count);
         }
 
@@ -72,12 +80,6 @@ namespace Chaos.NaCl
         {
             if (data.Array == null)
                 throw new ArgumentNullException("data.Array");
-            if (data.Offset < 0)
-                throw new ArgumentOutOfRangeException("data.Offset");
-            if (data.Count < 0)
-                throw new ArgumentOutOfRangeException("data.Count", "Requires count >= 0");
-            if ((uint)data.Offset + (uint)data.Count > (uint)data.Array.Length)
-                throw new ArgumentOutOfRangeException("data.Count", "Requires offset + count <= data.Length");
             InternalWipe(data.Array, data.Offset, data.Count);
         }
 
@@ -93,6 +95,14 @@ namespace Chaos.NaCl
         internal static void InternalWipe(byte[] data, int offset, int count)
         {
             Array.Clear(data, offset, count);
+        }
+
+        // shallow wipe of structs
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        internal static void InternalWipe<T>(ref T data)
+            where T : struct
+        {
+            data = default(T);
         }
 
         // constant time hex conversion
@@ -116,7 +126,7 @@ namespace Chaos.NaCl
         //
         // * I didn't use a second loop variable to index into `c`, since measurement shows that calculating it from `i` is cheaper. 
         // * Using exactly `i < bytes.Length` as upper bound of the loop allows the JITter to eliminate bounds checks on `bytes[i]`, so I chose that variant.
-        // * Making `b` an int allows unnecessary conversions from and to byte.
+        // * Making `b` an int avoids unnecessary conversions from and to byte.
         public static string ToHexStringUpper(byte[] data)
         {
             if (data == null)
@@ -156,7 +166,7 @@ namespace Chaos.NaCl
             if (hexString == null)
                 return null;
             if (hexString.Length % 2 != 0)
-                throw new ArgumentException("Invalid hexString");
+                throw new FormatException("The hex string is invalid because it has an odd length");
             var result = new byte[hexString.Length / 2];
             for (int i = 0; i < result.Length; i++)
                 result[i] = Convert.ToByte(hexString.Substring(i * 2, 2), 16);
@@ -165,11 +175,15 @@ namespace Chaos.NaCl
 
         public static string ToBase64String(byte[] data)
         {
+            if (data == null)
+                return null;
             return Convert.ToBase64String(data);
         }
 
         public static byte[] FromBase64String(string s)
         {
+            if (s == null)
+                return null;
             return Convert.FromBase64String(s);
         }
     }

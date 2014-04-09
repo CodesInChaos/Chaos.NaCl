@@ -52,21 +52,21 @@ namespace Chaos.NaCl.Internal
             buf[offset + 0] = (byte)(value >> 56);
         }
 
-        public static void XorLittleEndian32(byte[] buf, int offset, UInt32 value)
+        /*public static void XorLittleEndian32(byte[] buf, int offset, UInt32 value)
         {
             buf[offset + 0] ^= (byte)value;
             buf[offset + 1] ^= (byte)(value >> 8);
             buf[offset + 2] ^= (byte)(value >> 16);
             buf[offset + 3] ^= (byte)(value >> 24);
-        }
+        }*/
 
-        public static void XorLittleEndian32(byte[] output, int outputOffset, byte[] input, int inputOffset, UInt32 value)
+        /*public static void XorLittleEndian32(byte[] output, int outputOffset, byte[] input, int inputOffset, UInt32 value)
         {
             output[outputOffset + 0] = (byte)(input[inputOffset + 0] ^ value);
             output[outputOffset + 1] = (byte)(input[inputOffset + 1] ^ (value >> 8));
             output[outputOffset + 2] = (byte)(input[inputOffset + 2] ^ (value >> 16));
             output[outputOffset + 3] = (byte)(input[inputOffset + 3] ^ (value >> 24));
-        }
+        }*/
 
         #endregion
 
@@ -84,7 +84,7 @@ namespace Chaos.NaCl.Internal
             output.x7 = LoadLittleEndian32(input, inputOffset + 28);
         }
 
-        public static void Array8LoadLittleEndian32(out Array8<uint> output, byte[] input, int inputOffset, int inputLength)
+/*        public static void Array8LoadLittleEndian32(out Array8<uint> output, byte[] input, int inputOffset, int inputLength)
         {
 #if DEBUG
             if (inputLength <= 0)
@@ -203,13 +203,12 @@ namespace Chaos.NaCl.Internal
                 default:
                     throw new InvalidOperationException();
             }
-        }
+        }*/
 
-        public static void Array8XorLittleEndian(byte[] output, int outputOffset, byte[] input, int inputOffset, ref Array8<uint> keyStream, int length)
+        /*public static void Array8XorLittleEndian(byte[] output, int outputOffset, byte[] input, int inputOffset, ref Array8<uint> keyStream, int length)
         {
 #if DEBUG
-            if (length <= 0)
-                throw new ArgumentException();
+            InternalAssert(length > 0);
 #endif
             int outputEnd = outputOffset + length;
             UInt32 highestInt;
@@ -293,9 +292,9 @@ namespace Chaos.NaCl.Internal
                 default:
                     throw new InvalidOperationException();
             }
-        }
+        }*/
 
-        public static void Array8StoreLittleEndian32(byte[] output, int outputOffset, ref Array8<uint> input)
+        /*public static void Array8StoreLittleEndian32(byte[] output, int outputOffset, ref Array8<uint> input)
         {
             StoreLittleEndian32(output, outputOffset + 0, input.x0);
             StoreLittleEndian32(output, outputOffset + 4, input.x1);
@@ -305,7 +304,7 @@ namespace Chaos.NaCl.Internal
             StoreLittleEndian32(output, outputOffset + 20, input.x5);
             StoreLittleEndian32(output, outputOffset + 24, input.x6);
             StoreLittleEndian32(output, outputOffset + 28, input.x7);
-        }
+        }*/
         #endregion
 
         public static void Array16LoadBigEndian64(out Array16<UInt64> output, byte[] input, int inputOffset)
@@ -328,7 +327,7 @@ namespace Chaos.NaCl.Internal
             output.x15 = LoadBigEndian64(input, inputOffset + 120);
         }
 
-
+        // ToDo: Only used in tests. Remove?
         public static void Array16LoadLittleEndian32(out Array16<UInt32> output, byte[] input, int inputOffset)
         {
             output.x0 = LoadLittleEndian32(input, inputOffset + 0);
@@ -349,7 +348,7 @@ namespace Chaos.NaCl.Internal
             output.x15 = LoadLittleEndian32(input, inputOffset + 60);
         }
 
-        public static void Array16LoadLittleEndian32(out Array16<UInt32> output, byte[] input, int inputOffset, int inputLength)
+        /*public static void Array16LoadLittleEndian32(out Array16<UInt32> output, byte[] input, int inputOffset, int inputLength)
         {
             Array8<UInt32> temp;
             if (inputLength > 32)
@@ -392,7 +391,7 @@ namespace Chaos.NaCl.Internal
                 output.x14 = 0;
                 output.x15 = 0;
             }
-        }
+        }*/
 
         public static void Array16StoreLittleEndian32(byte[] output, int outputOffset, ref Array16<UInt32> input)
         {

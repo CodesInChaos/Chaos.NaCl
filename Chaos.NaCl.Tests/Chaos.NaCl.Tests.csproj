@@ -39,6 +39,7 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Numerics" />
   </ItemGroup>
   <Choose>
     <When Condition="('$(VisualStudioVersion)' == '10.0' or '$(VisualStudioVersion)' == '') and '$(TargetFrameworkVersion)' == 'v3.5'">
@@ -57,7 +58,9 @@
     <Compile Include="CryptoBytesTest.cs" />
     <Compile Include="Ed25519Tests.cs" />
     <Compile Include="Ed25519TestVectors.cs" />
+    <Compile Include="InternalAssertTests.cs" />
     <Compile Include="MontgomeryCurve25519TestVectors.cs" />
+    <Compile Include="Poly1305Tests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MontgomeryCurve25519Tests.cs" />
     <Compile Include="SalsaCoreTests.cs" />

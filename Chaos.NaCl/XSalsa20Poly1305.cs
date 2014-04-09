@@ -5,7 +5,7 @@ using Chaos.NaCl.Internal.Salsa;
 
 namespace Chaos.NaCl
 {
-    public class XSalsa20Poly1305
+    public static class XSalsa20Poly1305
     {
         public static readonly int KeySizeInBytes = 32;
         public static readonly int NonceSizeInBytes = 24;
@@ -13,6 +13,12 @@ namespace Chaos.NaCl
 
         public static byte[] Encrypt(byte[] message, byte[] key, byte[] nonce)
         {
+            if (message == null)
+                throw new ArgumentNullException("message");
+            if (key == null)
+                throw new ArgumentNullException("key");
+            if (nonce == null)
+                throw new ArgumentNullException("nonce");
             if (key.Length != KeySizeInBytes)
                 throw new ArgumentException("key.Length != 32");
             if (nonce.Length != NonceSizeInBytes)
@@ -35,7 +41,7 @@ namespace Chaos.NaCl
         }
 
         /// <summary>
-        /// 
+        /// Decrypts the ciphertext and verifies its authenticity
         /// </summary>
         /// <returns>Plaintext if MAC validation succeeds, null if the data is invalid.</returns>
         public static byte[] TryDecrypt(byte[] ciphertext, byte[] key, byte[] nonce)
@@ -61,6 +67,14 @@ namespace Chaos.NaCl
                 return null;
         }
 
+        /// <summary>
+        /// Decrypts the ciphertext and verifies its authenticity
+        /// </summary>
+        /// <param name="message">Plaintext if authentication succeeded, all zero if authentication failed, unmodified if argument verification fails</param>
+        /// <param name="ciphertext"></param>
+        /// <param name="key">Symmetric key. Must be identical to key specified for encryption.</param>
+        /// <param name="nonce">Must be identical to nonce specified for encryption.</param>
+        /// <returns>true if ciphertext is authentic, false otherwise</returns>
         public static bool TryDecrypt(ArraySegment<byte> message, ArraySegment<byte> ciphertext, ArraySegment<byte> key, ArraySegment<byte> nonce)
         {
             if (key.Count != KeySizeInBytes)
@@ -117,7 +131,7 @@ namespace Chaos.NaCl
 
         private static bool DecryptInternal(byte[] plaintext, int plaintextOffset, byte[] ciphertext, int ciphertextOffset, int ciphertextLength, byte[] key, int keyOffset, byte[] nonce, int nonceOffset)
         {
-            int plaintextLength = ciphertextLength - 16;
+            int plaintextLength = ciphertextLength - MacSizeInBytes;
             Array16<UInt32> internalKey;
             PrepareInternalKey(out internalKey, key, keyOffset, nonce, nonceOffset);
 
@@ -141,8 +155,11 @@ namespace Chaos.NaCl
 
                 // compute MAC
                 Poly1305Donna.poly1305_auth(tempBytes, 0, ciphertext, ciphertextOffset + 16, plaintextLength, ref poly1305Key);
-                if (!CryptoBytes.ConstantTimeEquals(tempBytes, 0, ciphertext, ciphertextOffset, 16))
+                if (!CryptoBytes.ConstantTimeEquals(tempBytes, 0, ciphertext, ciphertextOffset, MacSizeInBytes))
+                {
+                    Array.Clear(plaintext, plaintextOffset, plaintextLength);
                     return false;
+                }
 
                 // rest for the message
                 ByteIntegerConverter.StoreLittleEndian32(tempBytes, 0, temp.x8);
@@ -155,7 +172,7 @@ namespace Chaos.NaCl
                 ByteIntegerConverter.StoreLittleEndian32(tempBytes, 28, temp.x15);
                 int count = Math.Min(32, plaintextLength);
                 for (int i = 0; i < count; i++)
-                    plaintext[plaintextOffset + i] = (byte)(ciphertext[16 + ciphertextOffset + i] ^ tempBytes[i]);
+                    plaintext[plaintextOffset + i] = (byte)(ciphertext[MacSizeInBytes + ciphertextOffset + i] ^ tempBytes[i]);
             }
 
             // later iterations

@@ -23,6 +23,11 @@ namespace Chaos.NaCl.Tests
             Assert.AreEqual(BitConverter.ToString(expected), BitConverter.ToString(actual));
         }
 
+        /*public static void AssertEqualBytes(ArraySegment<byte> expected, ArraySegment<byte> actual)
+        {
+            AssertEqualBytes(expected.ToArray(), actual.ToArray());
+        }*/
+
         public static ArraySegment<byte> Pad(this byte[] array)
         {
             return array.Pad(Random(1, 100), Random(0, 50));

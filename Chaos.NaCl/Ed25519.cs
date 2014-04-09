@@ -88,7 +88,6 @@ namespace Chaos.NaCl
 			expandedPrivateKey = sk;
 		}
 
-		[Obsolete("Needs more testing")]
 		public static void KeyPairFromSeed(ArraySegment<byte> publicKey, ArraySegment<byte> expandedPrivateKey, ArraySegment<byte> privateKeySeed)
 		{
 			if (publicKey.Array == null)

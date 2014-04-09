@@ -36,9 +36,7 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
 
 			for (i = 0; i < 32; ++i)
 				e[i] = n[noffset + i];
-			e[0] &= 248;
-			e[31] &= 127;
-			e[31] |= 64;
+		    ScalarOperations.sc_clamp(e, 0);
 			x1 = p;
 			FieldOperations.fe_1(out x2);
 			FieldOperations.fe_0(out z2);

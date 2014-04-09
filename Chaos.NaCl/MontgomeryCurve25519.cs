@@ -50,9 +50,7 @@ namespace Chaos.NaCl
             {
                 publicKey.Array[publicKey.Offset + i] = privateKey.Array[privateKey.Offset + i];
             }
-            publicKey.Array[publicKey.Offset + 0] &= 248;
-            publicKey.Array[publicKey.Offset + 31] &= 63;
-            publicKey.Array[publicKey.Offset + 31] |= 64;
+            ScalarOperations.sc_clamp(publicKey.Array, publicKey.Offset);
 
             GroupElementP3 A;
             GroupOperations.ge_scalarmult_base(out A, publicKey.Array, publicKey.Offset);

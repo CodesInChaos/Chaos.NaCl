@@ -62,6 +62,7 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
 
         public static void ge_scalarmult_base(out GroupElementP3 h, byte[] a, int offset)
         {
+            // todo: Perhaps remove this allocation
             sbyte[] e = new sbyte[64];
             sbyte carry;
             GroupElementP1P1 r;

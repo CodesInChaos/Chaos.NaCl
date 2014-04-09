@@ -117,8 +117,9 @@ namespace Chaos.NaCl.Benchmark
             Console.WriteLine("=== Symmetric ===");
             CheckCurrentCpuFreq();
             {
-                Console.WriteLine("XSalsa20Poly1305 Encrypt 16 kB");
-                var message = new byte[128 * 1024];
+                int size = 128 * 1024;
+                Console.WriteLine("XSalsa20Poly1305 Encrypt {0} KiB", size / 1024.0);
+                var message = new byte[size];
                 var ciphertext = new byte[message.Length + 16];
                 var key = new byte[32];
                 var nonce = new byte[24];

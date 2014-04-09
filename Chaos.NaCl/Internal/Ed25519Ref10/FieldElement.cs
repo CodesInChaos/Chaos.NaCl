@@ -15,13 +15,12 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
         internal int x8;
         internal int x9;
 
-        public static readonly FieldElement Zero = new FieldElement();
-        public static readonly FieldElement One = new FieldElement() { x0 = 1 };
+        //public static readonly FieldElement Zero = new FieldElement();
+        //public static readonly FieldElement One = new FieldElement() { x0 = 1 };
 
         internal FieldElement(params int[] elements)
         {
-            if (elements.Length != 10)
-                throw new ArgumentException("elements.Length != 10");
+            InternalAssert.Assert(elements.Length == 10, "elements.Length != 10");
             x0 = elements[0];
             x1 = elements[1];
             x2 = elements[2];

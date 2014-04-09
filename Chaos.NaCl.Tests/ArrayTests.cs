@@ -11,7 +11,7 @@ namespace Chaos.NaCl.Tests
     {
         private static readonly byte[] _testInput = Enumerable.Repeat((byte)0xFF, 100).Concat(Enumerable.Range(1, 250).Select(i => (byte)i)).ToArray();
 
-        [TestMethod]
+        /*[TestMethod]
         public void Array8FromBytesLittleEndian()
         {
             for (int len = 1; len <= 32; len++)
@@ -23,9 +23,9 @@ namespace Chaos.NaCl.Tests
                 byte[] expectedOutput = Enumerable.Range(1, len).Select(i => (byte)i).Concat(Enumerable.Repeat((byte)0x00, 32 - len)).ToArray();
                 Assert.AreEqual(BitConverter.ToString(expectedOutput), BitConverter.ToString(output));
             }
-        }
+        }*/
 
-        [TestMethod]
+        /*[TestMethod]
         public void Array16FromBytesLittleEndian()
         {
             for (int len = 1; len <= 64; len++)
@@ -37,6 +37,6 @@ namespace Chaos.NaCl.Tests
                 byte[] expectedOutput = Enumerable.Range(1, len).Select(i => (byte)i).Concat(Enumerable.Repeat((byte)0x00, 64 - len)).ToArray();
                 Assert.AreEqual(BitConverter.ToString(expectedOutput), BitConverter.ToString(output));
             }
-        }
+        }*/
     }
 }

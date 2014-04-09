@@ -4,7 +4,7 @@ using Chaos.NaCl.Internal;
 
 namespace Chaos.NaCl
 {
-    internal class Poly1305 : OneTimeAuth
+    internal sealed class Poly1305 : OneTimeAuth
     {
         public override int KeySizeInBytes
         {

@@ -10,6 +10,18 @@ namespace Chaos.NaCl.Tests
     [TestClass]
     public class Sha512Tests
     {
+        private static readonly byte[] _sha512HashAbc = new byte[]
+                {
+                    0xDD, 0xAF, 0x35, 0xA1, 0x93, 0x61, 0x7A, 0xBA,
+                    0xCC, 0x41, 0x73, 0x49, 0xAE, 0x20, 0x41, 0x31,
+                    0x12, 0xE6, 0xFA, 0x4E, 0x89, 0xA9, 0x7E, 0xA2,
+                    0x0A, 0x9E, 0xEE, 0xE6, 0x4B, 0x55, 0xD3, 0x9A,
+                    0x21, 0x92, 0x99, 0x2A, 0x27, 0x4F, 0xC1, 0xA8,
+                    0x36, 0xBA, 0x3C, 0x23, 0xA3, 0xFE, 0xEB, 0xBD,
+                    0x45, 0x4D, 0x44, 0x23, 0x64, 0x3C, 0xE8, 0x0E,
+                    0x2A, 0x9A, 0xC9, 0x4F, 0xA5, 0x4C, 0xA4, 0x9F
+                };
+
         [TestMethod]
         public void Sha512_1()
         {
@@ -91,19 +103,45 @@ namespace Chaos.NaCl.Tests
         public void Sha512Abc()
         {
             var message = new[] { (byte)'a', (byte)'b', (byte)'c' };
-            var hashExpected = new byte[]
-                {
-                    0xDD, 0xAF, 0x35, 0xA1, 0x93, 0x61, 0x7A, 0xBA,
-                    0xCC, 0x41, 0x73, 0x49, 0xAE, 0x20, 0x41, 0x31,
-                    0x12, 0xE6, 0xFA, 0x4E, 0x89, 0xA9, 0x7E, 0xA2,
-                    0x0A, 0x9E, 0xEE, 0xE6, 0x4B, 0x55, 0xD3, 0x9A,
-                    0x21, 0x92, 0x99, 0x2A, 0x27, 0x4F, 0xC1, 0xA8,
-                    0x36, 0xBA, 0x3C, 0x23, 0xA3, 0xFE, 0xEB, 0xBD,
-                    0x45, 0x4D, 0x44, 0x23, 0x64, 0x3C, 0xE8, 0x0E,
-                    0x2A, 0x9A, 0xC9, 0x4F, 0xA5, 0x4C, 0xA4, 0x9F
-                };
+            var hashExpected = _sha512HashAbc;
             var hash = Sha512.Hash(message);
             Assert.AreEqual(BitConverter.ToString(hashExpected), BitConverter.ToString(hash));
+        }
+
+        [TestMethod]
+        public void Sha512OutputSegments()
+        {
+            var message = new[] { (byte)'a', (byte)'b', (byte)'c' };
+            var hashExpected = _sha512HashAbc;
+            var sha512 = new Sha512();
+            sha512.Update(message, 0, message.Length);
+            var output = new byte[64].Pad();
+            sha512.Finish(output);
+            Assert.AreEqual(BitConverter.ToString(hashExpected), BitConverter.ToString(output.ToArray()));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void Sha512OutputSegmentsNull()
+        {
+            var sha512 = new Sha512();
+            sha512.Finish(default(ArraySegment<byte>));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentException))]
+        public void Sha512OutputSegmentsIncorretOutputSize()
+        {
+            var sha512 = new Sha512();
+            sha512.Finish(new byte[32].Pad());
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void Sha512UpdateSegmentsNull()
+        {
+            var sha512 = new Sha512();
+            sha512.Update(default(ArraySegment<byte>));
         }
     }
 }

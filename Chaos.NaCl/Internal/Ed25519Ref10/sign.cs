@@ -52,9 +52,7 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
 			{
                 hasher.Update(sk, skoffset, 32);
 			    az = hasher.Finish();
-				az[0] &= 248;
-				az[31] &= 63;
-				az[31] |= 64;
+			    ScalarOperations.sc_clamp(az, 0);
 
 			    hasher.Init();
 				hasher.Update(az, 32, 32);
