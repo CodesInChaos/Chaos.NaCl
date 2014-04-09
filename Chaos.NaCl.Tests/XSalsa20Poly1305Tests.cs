@@ -126,5 +126,19 @@ namespace Chaos.NaCl.Tests
             var plaintextActual = XSalsa20Poly1305.TryDecrypt(new byte[15], _key, _nonce);
             Assert.AreEqual(null, plaintextActual);
         }
+
+        // Tests for a bug in Decrypt when using short input messages.
+        [TestMethod]
+        public void TestShortMessageRoundTrip() {
+            var plainTextOrig = "Can you read this?";
+            byte[] nonce = new byte[XSalsa20Poly1305.NonceSizeInBytes];
+            byte[] key = new byte[XSalsa20Poly1305.KeySizeInBytes];
+
+            var plainTextBytes = System.Text.Encoding.ASCII.GetBytes(plainTextOrig);
+            var cypherText = XSalsa20Poly1305.Encrypt(plainTextBytes, key, nonce);
+            var plainTextByte = XSalsa20Poly1305.TryDecrypt(cypherText, key, nonce);
+            var plainTextResult = System.Text.Encoding.ASCII.GetString(plainTextBytes);
+            Assert.AreEqual(plainTextOrig, plainTextResult);
+        }
     }
 }
