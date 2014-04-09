@@ -153,7 +153,7 @@ namespace Chaos.NaCl
                 ByteIntegerConverter.StoreLittleEndian32(tempBytes, 20, temp.x13);
                 ByteIntegerConverter.StoreLittleEndian32(tempBytes, 24, temp.x14);
                 ByteIntegerConverter.StoreLittleEndian32(tempBytes, 28, temp.x15);
-                int count = Math.Min(32, ciphertextLength);
+                int count = Math.Min(32, plaintextLength);
                 for (int i = 0; i < count; i++)
                     plaintext[plaintextOffset + i] = (byte)(ciphertext[16 + ciphertextOffset + i] ^ tempBytes[i]);
             }

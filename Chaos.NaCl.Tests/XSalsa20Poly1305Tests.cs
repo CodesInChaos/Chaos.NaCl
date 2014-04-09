@@ -126,5 +126,32 @@ namespace Chaos.NaCl.Tests
             var plaintextActual = XSalsa20Poly1305.TryDecrypt(new byte[15], _key, _nonce);
             Assert.AreEqual(null, plaintextActual);
         }
+
+        [TestMethod]
+        public void RoundTripSuccessWithManyLengthes()
+        {
+            for (int length = 0; length < 1000; length++)
+            {
+                var plaintextExpected = Enumerable.Range(0, length).Select(i => (byte)i).ToArray();
+                var ciphertext = XSalsa20Poly1305.Encrypt(plaintextExpected.ToArray(), _key, _nonce);
+                var plaintextActual = XSalsa20Poly1305.TryDecrypt(ciphertext, _key, _nonce);
+                TestHelpers.AssertEqualBytes(plaintextExpected, plaintextActual);
+            }
+        }
+
+        [TestMethod]
+        public void RoundTripFailWithManyLengthes()
+        {
+            for (int length = 0; length < 130; length++)//130 bytes exceeds two blocks
+            {
+                var originalPlaintext = Enumerable.Range(0, length).Select(i => (byte)i).ToArray();
+                var ciphertext = XSalsa20Poly1305.Encrypt(originalPlaintext.ToArray(), _key, _nonce);
+                foreach (var brokenCiphertext in ciphertext.WithChangedBit())
+                {
+                    var plaintextActual = XSalsa20Poly1305.TryDecrypt(brokenCiphertext, _key, _nonce);
+                    Assert.AreEqual(null, plaintextActual);
+                }
+            }
+        }
     }
 }
