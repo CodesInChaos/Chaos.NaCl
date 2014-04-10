@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Security.Cryptography;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Chaos.NaCl.Tests
@@ -140,6 +141,23 @@ namespace Chaos.NaCl.Tests
             {
                 Assert.IsFalse(Ed25519.Verify(modifiedSignature.Pad(), message.Pad(), pk.Pad()));
             }
+        }
+
+        [TestMethod]
+        public void KeyExchange()
+        {
+            RNGCryptoServiceProvider rngCryptoServiceProvider = new RNGCryptoServiceProvider();
+            byte[] publicKey0, expandedPrivateKey0;
+            byte[] seed1 = new byte[32];
+            rngCryptoServiceProvider.GetBytes(seed1);
+            Ed25519.KeyPairFromSeed(out publicKey0, out expandedPrivateKey0, seed1);
+            byte[] publicKey1, expandedPrivateKey1;
+            byte[] seed2 = new byte[32];
+            rngCryptoServiceProvider.GetBytes(seed2);
+            Ed25519.KeyPairFromSeed(out publicKey1, out expandedPrivateKey1, seed2);
+            byte[] sharedKey0 = Ed25519.KeyExchange(publicKey1, expandedPrivateKey0);
+            byte[] sharedKey1 = Ed25519.KeyExchange(publicKey0, expandedPrivateKey1);
+            TestHelpers.AssertEqualBytes(sharedKey0, sharedKey1);
         }
     }
 }
