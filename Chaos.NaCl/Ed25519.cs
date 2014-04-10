@@ -129,14 +129,17 @@ namespace Chaos.NaCl
 				throw new ArgumentException("sharedKey.Count != 32");
 			if (publicKey.Count != 32)
 				throw new ArgumentException("publicKey.Count != 32");
-			if (privateKey.Count != 64)
-				throw new ArgumentException("privateKey.Count != 64");
+			if (privateKey.Count != 64 && privateKey.Count != 32) // seed is enough, full expanded private key is OK
+				throw new ArgumentException("privateKey.Count != 64 && privateKey.Count != 32");
+
+			var ua = new byte[32];
+			Ed25519Operations.unmultiplied_a(ua, 0, privateKey.Array, privateKey.Offset);
 
 			FieldElement montgomeryX, edwardsY, edwardsZ, sharedMontgomeryX;
 			FieldOperations.fe_frombytes(out edwardsY, publicKey.Array, publicKey.Offset);
 			FieldOperations.fe_1(out edwardsZ);
 			MontgomeryCurve25519.EdwardsToMontgomeryX(out montgomeryX, ref edwardsY, ref edwardsZ);
-			MontgomeryOperations.scalarmult(out sharedMontgomeryX, privateKey.Array, privateKey.Offset, ref montgomeryX);
+			MontgomeryOperations.scalarmult(out sharedMontgomeryX, ua, 0, ref montgomeryX);
 			FieldOperations.fe_tobytes(sharedKey.Array, sharedKey.Offset, ref sharedMontgomeryX);
 			MontgomeryCurve25519.KeyExchangeOutputHashNaCl(sharedKey.Array, sharedKey.Offset);
 		}
