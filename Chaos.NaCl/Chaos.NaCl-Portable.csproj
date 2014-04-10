@@ -87,6 +87,7 @@
     <Compile Include="Internal\Ed25519Ref10\sc_reduce.cs" />
     <Compile Include="Internal\Ed25519Ref10\sign.cs" />
     <Compile Include="Internal\Ed25519Ref10\sqrtm1.cs" />
+    <Compile Include="Internal\Ed25519Ref10\unmultiplied_a.cs" />
     <Compile Include="Internal\InternalAssert.cs" />
     <Compile Include="Internal\Poly1305Donna.cs" />
     <Compile Include="Internal\Salsa\Salsa20.cs" />
