@@ -96,6 +96,7 @@
     <Compile Include="Internal\Ed25519Ref10\sc_reduce.cs" />
     <Compile Include="Internal\Ed25519Ref10\sign.cs" />
     <Compile Include="Internal\Ed25519Ref10\sqrtm1.cs" />
+    <Compile Include="Internal\Ed25519Ref10\unmultiplied_a.cs" />
     <Compile Include="OneTimeAuth.cs" />
     <Compile Include="Poly1305.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
