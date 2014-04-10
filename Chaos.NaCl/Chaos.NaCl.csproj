@@ -91,12 +91,12 @@
     <Compile Include="Internal\Ed25519Ref10\ge_tobytes.cs" />
     <Compile Include="Internal\Ed25519Ref10\GroupElement.cs" />
     <Compile Include="Internal\Ed25519Ref10\keypair.cs" />
-    <Compile Include="Internal\Ed25519Ref10\unmultiplied_a.cs" />
     <Compile Include="Internal\Ed25519Ref10\open.cs" />
     <Compile Include="Internal\Ed25519Ref10\sc_mul_add.cs" />
     <Compile Include="Internal\Ed25519Ref10\sc_reduce.cs" />
     <Compile Include="Internal\Ed25519Ref10\sign.cs" />
     <Compile Include="Internal\Ed25519Ref10\sqrtm1.cs" />
+    <Compile Include="Internal\Ed25519Ref10\unmultiplied_a.cs" />
     <Compile Include="OneTimeAuth.cs" />
     <Compile Include="Poly1305.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
