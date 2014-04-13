@@ -6,18 +6,19 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
     {
         static byte equal(byte b, byte c)
         {
+
             byte ub = b;
             byte uc = c;
             byte x = (byte)(ub ^ uc); /* 0: yes; 1..255: no */
             UInt32 y = x; /* 0: yes; 1..255: no */
-            y -= 1; /* 4294967295: yes; 0..254: no */
+            unchecked { y -= 1; } /* 4294967295: yes; 0..254: no */
             y >>= 31; /* 1: yes; 0: no */
             return (byte)y;
         }
 
         static byte negative(sbyte b)
         {
-            ulong x = (ulong)(long)b; /* 18446744073709551361..18446744073709551615: yes; 0..255: no */
+            ulong x = unchecked((ulong)(long)b); /* 18446744073709551361..18446744073709551615: yes; 0..255: no */
             x >>= 63; /* 1: yes; 0: no */
             return (byte)x;
         }

@@ -21,10 +21,10 @@ namespace Chaos.NaCl.Internal
 
         public static void StoreLittleEndian32(byte[] buf, int offset, UInt32 value)
         {
-            buf[offset + 0] = (byte)value;
-            buf[offset + 1] = (byte)(value >> 8);
-            buf[offset + 2] = (byte)(value >> 16);
-            buf[offset + 3] = (byte)(value >> 24);
+            buf[offset + 0] = unchecked((byte)value);
+            buf[offset + 1] = unchecked((byte)(value >> 8));
+            buf[offset + 2] = unchecked((byte)(value >> 16));
+            buf[offset + 3] = unchecked((byte)(value >> 24));
         }
 
         public static UInt64 LoadBigEndian64(byte[] buf, int offset)
@@ -42,14 +42,14 @@ namespace Chaos.NaCl.Internal
 
         public static void StoreBigEndian64(byte[] buf, int offset, UInt64 value)
         {
-            buf[offset + 7] = (byte)value;
-            buf[offset + 6] = (byte)(value >> 8);
-            buf[offset + 5] = (byte)(value >> 16);
-            buf[offset + 4] = (byte)(value >> 24);
-            buf[offset + 3] = (byte)(value >> 32);
-            buf[offset + 2] = (byte)(value >> 40);
-            buf[offset + 1] = (byte)(value >> 48);
-            buf[offset + 0] = (byte)(value >> 56);
+            buf[offset + 7] = unchecked((byte)value);
+            buf[offset + 6] = unchecked((byte)(value >> 8));
+            buf[offset + 5] = unchecked((byte)(value >> 16));
+            buf[offset + 4] = unchecked((byte)(value >> 24));
+            buf[offset + 3] = unchecked((byte)(value >> 32));
+            buf[offset + 2] = unchecked((byte)(value >> 40));
+            buf[offset + 1] = unchecked((byte)(value >> 48));
+            buf[offset + 0] = unchecked((byte)(value >> 56));
         }
 
         /*public static void XorLittleEndian32(byte[] buf, int offset, UInt32 value)
@@ -84,126 +84,126 @@ namespace Chaos.NaCl.Internal
             output.x7 = LoadLittleEndian32(input, inputOffset + 28);
         }
 
-/*        public static void Array8LoadLittleEndian32(out Array8<uint> output, byte[] input, int inputOffset, int inputLength)
-        {
-#if DEBUG
-            if (inputLength <= 0)
-                throw new ArgumentException();
-#endif
-            int inputEnd = inputOffset + inputLength;
-            UInt32 highestInt;
-            switch (inputLength & 3)
-            {
-                case 1:
-                    highestInt = input[inputEnd - 1];
-                    break;
-                case 2:
-                    highestInt = (uint)(
-                        (input[inputEnd - 1] << 8) |
-                        (input[inputEnd - 2]));
-                    break;
-                case 3:
-                    highestInt = (uint)(
-                        (input[inputEnd - 1] << 16) |
-                        (input[inputEnd - 2] << 8) |
-                        (input[inputEnd - 3]));
-                    break;
-                case 0:
-                    highestInt = (uint)(
-                        (input[inputEnd - 1] << 24) |
-                        (input[inputEnd - 2] << 16) |
-                        (input[inputEnd - 3] << 8) |
-                        (input[inputEnd - 4]));
-                    break;
-                default:
-                    throw new InvalidOperationException();
-            }
-            switch ((inputLength - 1) >> 2)
-            {
-                case 7:
-                    output.x7 = highestInt;
-                    output.x6 = LoadLittleEndian32(input, inputOffset + 6 * 4);
-                    output.x5 = LoadLittleEndian32(input, inputOffset + 5 * 4);
-                    output.x4 = LoadLittleEndian32(input, inputOffset + 4 * 4);
-                    output.x3 = LoadLittleEndian32(input, inputOffset + 3 * 4);
-                    output.x2 = LoadLittleEndian32(input, inputOffset + 2 * 4);
-                    output.x1 = LoadLittleEndian32(input, inputOffset + 1 * 4);
-                    output.x0 = LoadLittleEndian32(input, inputOffset + 0 * 4);
-                    return;
-                case 6:
-                    output.x7 = 0;
-                    output.x6 = highestInt;
-                    output.x5 = LoadLittleEndian32(input, inputOffset + 5 * 4);
-                    output.x4 = LoadLittleEndian32(input, inputOffset + 4 * 4);
-                    output.x3 = LoadLittleEndian32(input, inputOffset + 3 * 4);
-                    output.x2 = LoadLittleEndian32(input, inputOffset + 2 * 4);
-                    output.x1 = LoadLittleEndian32(input, inputOffset + 1 * 4);
-                    output.x0 = LoadLittleEndian32(input, inputOffset + 0 * 4);
-                    return;
-                case 5:
-                    output.x7 = 0;
-                    output.x6 = 0;
-                    output.x5 = highestInt;
-                    output.x4 = LoadLittleEndian32(input, inputOffset + 4 * 4);
-                    output.x3 = LoadLittleEndian32(input, inputOffset + 3 * 4);
-                    output.x2 = LoadLittleEndian32(input, inputOffset + 2 * 4);
-                    output.x1 = LoadLittleEndian32(input, inputOffset + 1 * 4);
-                    output.x0 = LoadLittleEndian32(input, inputOffset + 0 * 4);
-                    return;
-                case 4:
-                    output.x7 = 0;
-                    output.x6 = 0;
-                    output.x5 = 0;
-                    output.x4 = highestInt;
-                    output.x3 = LoadLittleEndian32(input, inputOffset + 3 * 4);
-                    output.x2 = LoadLittleEndian32(input, inputOffset + 2 * 4);
-                    output.x1 = LoadLittleEndian32(input, inputOffset + 1 * 4);
-                    output.x0 = LoadLittleEndian32(input, inputOffset + 0 * 4);
-                    return;
-                case 3:
-                    output.x7 = 0;
-                    output.x6 = 0;
-                    output.x5 = 0;
-                    output.x4 = 0;
-                    output.x3 = highestInt;
-                    output.x2 = LoadLittleEndian32(input, inputOffset + 2 * 4);
-                    output.x1 = LoadLittleEndian32(input, inputOffset + 1 * 4);
-                    output.x0 = LoadLittleEndian32(input, inputOffset + 0 * 4);
-                    return;
-                case 2:
-                    output.x7 = 0;
-                    output.x6 = 0;
-                    output.x5 = 0;
-                    output.x4 = 0;
-                    output.x3 = 0;
-                    output.x2 = highestInt;
-                    output.x1 = LoadLittleEndian32(input, inputOffset + 1 * 4);
-                    output.x0 = LoadLittleEndian32(input, inputOffset + 0 * 4);
-                    return;
-                case 1:
-                    output.x7 = 0;
-                    output.x6 = 0;
-                    output.x5 = 0;
-                    output.x4 = 0;
-                    output.x3 = 0;
-                    output.x2 = 0;
-                    output.x1 = highestInt;
-                    output.x0 = LoadLittleEndian32(input, inputOffset + 0 * 4);
-                    return;
-                case 0:
-                    output.x7 = 0;
-                    output.x6 = 0;
-                    output.x5 = 0;
-                    output.x4 = 0;
-                    output.x3 = 0;
-                    output.x2 = 0;
-                    output.x1 = 0;
-                    output.x0 = highestInt;
-                    return;
-                default:
-                    throw new InvalidOperationException();
-            }
-        }*/
+        /*        public static void Array8LoadLittleEndian32(out Array8<uint> output, byte[] input, int inputOffset, int inputLength)
+                {
+        #if DEBUG
+                    if (inputLength <= 0)
+                        throw new ArgumentException();
+        #endif
+                    int inputEnd = inputOffset + inputLength;
+                    UInt32 highestInt;
+                    switch (inputLength & 3)
+                    {
+                        case 1:
+                            highestInt = input[inputEnd - 1];
+                            break;
+                        case 2:
+                            highestInt = (uint)(
+                                (input[inputEnd - 1] << 8) |
+                                (input[inputEnd - 2]));
+                            break;
+                        case 3:
+                            highestInt = (uint)(
+                                (input[inputEnd - 1] << 16) |
+                                (input[inputEnd - 2] << 8) |
+                                (input[inputEnd - 3]));
+                            break;
+                        case 0:
+                            highestInt = (uint)(
+                                (input[inputEnd - 1] << 24) |
+                                (input[inputEnd - 2] << 16) |
+                                (input[inputEnd - 3] << 8) |
+                                (input[inputEnd - 4]));
+                            break;
+                        default:
+                            throw new InvalidOperationException();
+                    }
+                    switch ((inputLength - 1) >> 2)
+                    {
+                        case 7:
+                            output.x7 = highestInt;
+                            output.x6 = LoadLittleEndian32(input, inputOffset + 6 * 4);
+                            output.x5 = LoadLittleEndian32(input, inputOffset + 5 * 4);
+                            output.x4 = LoadLittleEndian32(input, inputOffset + 4 * 4);
+                            output.x3 = LoadLittleEndian32(input, inputOffset + 3 * 4);
+                            output.x2 = LoadLittleEndian32(input, inputOffset + 2 * 4);
+                            output.x1 = LoadLittleEndian32(input, inputOffset + 1 * 4);
+                            output.x0 = LoadLittleEndian32(input, inputOffset + 0 * 4);
+                            return;
+                        case 6:
+                            output.x7 = 0;
+                            output.x6 = highestInt;
+                            output.x5 = LoadLittleEndian32(input, inputOffset + 5 * 4);
+                            output.x4 = LoadLittleEndian32(input, inputOffset + 4 * 4);
+                            output.x3 = LoadLittleEndian32(input, inputOffset + 3 * 4);
+                            output.x2 = LoadLittleEndian32(input, inputOffset + 2 * 4);
+                            output.x1 = LoadLittleEndian32(input, inputOffset + 1 * 4);
+                            output.x0 = LoadLittleEndian32(input, inputOffset + 0 * 4);
+                            return;
+                        case 5:
+                            output.x7 = 0;
+                            output.x6 = 0;
+                            output.x5 = highestInt;
+                            output.x4 = LoadLittleEndian32(input, inputOffset + 4 * 4);
+                            output.x3 = LoadLittleEndian32(input, inputOffset + 3 * 4);
+                            output.x2 = LoadLittleEndian32(input, inputOffset + 2 * 4);
+                            output.x1 = LoadLittleEndian32(input, inputOffset + 1 * 4);
+                            output.x0 = LoadLittleEndian32(input, inputOffset + 0 * 4);
+                            return;
+                        case 4:
+                            output.x7 = 0;
+                            output.x6 = 0;
+                            output.x5 = 0;
+                            output.x4 = highestInt;
+                            output.x3 = LoadLittleEndian32(input, inputOffset + 3 * 4);
+                            output.x2 = LoadLittleEndian32(input, inputOffset + 2 * 4);
+                            output.x1 = LoadLittleEndian32(input, inputOffset + 1 * 4);
+                            output.x0 = LoadLittleEndian32(input, inputOffset + 0 * 4);
+                            return;
+                        case 3:
+                            output.x7 = 0;
+                            output.x6 = 0;
+                            output.x5 = 0;
+                            output.x4 = 0;
+                            output.x3 = highestInt;
+                            output.x2 = LoadLittleEndian32(input, inputOffset + 2 * 4);
+                            output.x1 = LoadLittleEndian32(input, inputOffset + 1 * 4);
+                            output.x0 = LoadLittleEndian32(input, inputOffset + 0 * 4);
+                            return;
+                        case 2:
+                            output.x7 = 0;
+                            output.x6 = 0;
+                            output.x5 = 0;
+                            output.x4 = 0;
+                            output.x3 = 0;
+                            output.x2 = highestInt;
+                            output.x1 = LoadLittleEndian32(input, inputOffset + 1 * 4);
+                            output.x0 = LoadLittleEndian32(input, inputOffset + 0 * 4);
+                            return;
+                        case 1:
+                            output.x7 = 0;
+                            output.x6 = 0;
+                            output.x5 = 0;
+                            output.x4 = 0;
+                            output.x3 = 0;
+                            output.x2 = 0;
+                            output.x1 = highestInt;
+                            output.x0 = LoadLittleEndian32(input, inputOffset + 0 * 4);
+                            return;
+                        case 0:
+                            output.x7 = 0;
+                            output.x6 = 0;
+                            output.x5 = 0;
+                            output.x4 = 0;
+                            output.x3 = 0;
+                            output.x2 = 0;
+                            output.x1 = 0;
+                            output.x0 = highestInt;
+                            return;
+                        default:
+                            throw new InvalidOperationException();
+                    }
+                }*/
 
         /*public static void Array8XorLittleEndian(byte[] output, int outputOffset, byte[] input, int inputOffset, ref Array8<uint> keyStream, int length)
         {

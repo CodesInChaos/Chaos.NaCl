@@ -59,6 +59,7 @@ namespace Chaos.NaCl.Internal
             t2 = ByteIntegerConverter.LoadLittleEndian32(m, mStart - 8);
             t3 = ByteIntegerConverter.LoadLittleEndian32(m, mStart - 4);
 
+            //todo: looks like these can be simplified a bit
             h0 += t0 & 0x3ffffff;
             h1 += (uint)(((((UInt64)t1 << 32) | t0) >> 26) & 0x3ffffff);
             h2 += (uint)(((((UInt64)t2 << 32) | t1) >> 20) & 0x3ffffff);
@@ -73,11 +74,14 @@ namespace Chaos.NaCl.Internal
             tt3 = (ulong)h0 * r3 + (ulong)h1 * r2 + (ulong)h2 * r1 + (ulong)h3 * r0 + (ulong)h4 * s4;
             tt4 = (ulong)h0 * r4 + (ulong)h1 * r3 + (ulong)h2 * r2 + (ulong)h3 * r1 + (ulong)h4 * r0;
 
-            h0 = (UInt32)tt0 & 0x3ffffff; c = (tt0 >> 26);
-            tt1 += c; h1 = (UInt32)tt1 & 0x3ffffff; b = (UInt32)(tt1 >> 26);
-            tt2 += b; h2 = (UInt32)tt2 & 0x3ffffff; b = (UInt32)(tt2 >> 26);
-            tt3 += b; h3 = (UInt32)tt3 & 0x3ffffff; b = (UInt32)(tt3 >> 26);
-            tt4 += b; h4 = (UInt32)tt4 & 0x3ffffff; b = (UInt32)(tt4 >> 26);
+            unchecked
+            {
+                h0 = (UInt32)tt0 & 0x3ffffff; c = (tt0 >> 26);
+                tt1 += c; h1 = (UInt32)tt1 & 0x3ffffff; b = (UInt32)(tt1 >> 26);
+                tt2 += b; h2 = (UInt32)tt2 & 0x3ffffff; b = (UInt32)(tt2 >> 26);
+                tt3 += b; h3 = (UInt32)tt3 & 0x3ffffff; b = (UInt32)(tt3 >> 26);
+                tt4 += b; h4 = (UInt32)tt4 & 0x3ffffff; b = (UInt32)(tt4 >> 26);
+            }
             h0 += b * 5;
 
             if (mLength >= 16)
@@ -123,7 +127,7 @@ namespace Chaos.NaCl.Internal
             g1 = h1 + b; b = g1 >> 26; g1 &= 0x3ffffff;
             g2 = h2 + b; b = g2 >> 26; g2 &= 0x3ffffff;
             g3 = h3 + b; b = g3 >> 26; g3 &= 0x3ffffff;
-            g4 = h4 + b - (1 << 26);
+            g4 = unchecked(h4 + b - (1 << 26));
 
             b = (g4 >> 31) - 1;
             nb = ~b;
@@ -138,10 +142,13 @@ namespace Chaos.NaCl.Internal
             f2 = ((h2 >> 12) | (h3 << 14)) + (UInt64)key.x6;
             f3 = ((h3 >> 18) | (h4 << 8)) + (UInt64)key.x7;
 
-            ByteIntegerConverter.StoreLittleEndian32(output, outputOffset + 0, (uint)f0); f1 += (f0 >> 32);
-            ByteIntegerConverter.StoreLittleEndian32(output, outputOffset + 4, (uint)f1); f2 += (f1 >> 32);
-            ByteIntegerConverter.StoreLittleEndian32(output, outputOffset + 8, (uint)f2); f3 += (f2 >> 32);
-            ByteIntegerConverter.StoreLittleEndian32(output, outputOffset + 12, (uint)f3);
+            unchecked
+            {
+                ByteIntegerConverter.StoreLittleEndian32(output, outputOffset + 0, (uint)f0); f1 += (f0 >> 32);
+                ByteIntegerConverter.StoreLittleEndian32(output, outputOffset + 4, (uint)f1); f2 += (f1 >> 32);
+                ByteIntegerConverter.StoreLittleEndian32(output, outputOffset + 8, (uint)f2); f3 += (f2 >> 32);
+                ByteIntegerConverter.StoreLittleEndian32(output, outputOffset + 12, (uint)f3);
+            }
         }
     }
 }
