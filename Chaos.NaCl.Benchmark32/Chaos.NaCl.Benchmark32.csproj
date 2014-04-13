@@ -4,16 +4,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{28321BA8-C416-4F81-BE4C-1546CD62118B}</ProjectGuid>
+    <ProjectGuid>{414429EE-D02E-485B-BE58-52DF33CF56AA}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Chaos.NaCl.Benchmark</RootNamespace>
-    <AssemblyName>Chaos.NaCl.Benchmark</AssemblyName>
+    <RootNamespace>Chaos.NaCl.Benchmark32</RootNamespace>
+    <AssemblyName>Chaos.NaCl.Benchmark32</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,7 +24,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -32,22 +33,16 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Management" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="BenchmarkProgram.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Chaos.NaCl.Tests\Chaos.NaCl.Tests.csproj">
-      <Project>{433df668-e178-4f13-a500-4d3609f450b9}</Project>
-      <Name>Chaos.NaCl.Tests</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Chaos.NaCl\Chaos.NaCl.csproj">
-      <Project>{ae28fd14-7985-4707-a963-c94b8597ae50}</Project>
-      <Name>Chaos.NaCl</Name>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Chaos.NaCl.Benchmark\Chaos.NaCl.Benchmark.csproj">
+      <Project>{28321ba8-c416-4f81-be4c-1546cd62118b}</Project>
+      <Name>Chaos.NaCl.Benchmark</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

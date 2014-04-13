@@ -10,7 +10,7 @@ using Chaos.NaCl.Internal.Salsa;
 
 namespace Chaos.NaCl.Benchmark
 {
-    class Program
+    public class BenchmarkProgram
     {
         static uint CpuFreq;
 
@@ -67,7 +67,7 @@ namespace Chaos.NaCl.Benchmark
             }
         }
 
-        static void Main()
+        public static void Main()
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             Console.WriteLine("Architecture: {0} bit", IntPtr.Size * 8);
