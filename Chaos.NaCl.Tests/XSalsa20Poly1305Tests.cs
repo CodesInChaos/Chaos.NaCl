@@ -8,7 +8,7 @@ namespace Chaos.NaCl.Tests
     [TestClass]
     public class XSalsa20Poly1305Tests
     {
-        readonly byte[] _key = new byte[32]
+        static readonly byte[] _key = new byte[32]
                 {
                     0x1b, 0x27, 0x55, 0x64, 0x73, 0xe9, 0x85, 0xd4
                     , 0x62, 0xcd, 0x51, 0x19, 0x7a, 0x9a, 0x46, 0xc7
@@ -67,33 +67,35 @@ namespace Chaos.NaCl.Tests
                     , 0xe3, 0x55, 0xa5
                 };
 
+        private readonly IAuthenticatedStreamEncryption _box = SecretBox.XSalsa20Poly1305.Create(_key);
+
         [TestMethod]
         public void Encrypt()
         {
-            var ciphertextActual = XSalsa20Poly1305.Encrypt(_plaintext, _key, _nonce);
+            var ciphertextActual = _box.Encrypt(_plaintext, _nonce);
             TestHelpers.AssertEqualBytes(_ciphertext, ciphertextActual);
         }
 
         [TestMethod]
         public void EncryptSegments()
         {
-            var ciphertextActual = new byte[_plaintext.Length + XSalsa20Poly1305.MacSizeInBytes].Pad();
-            XSalsa20Poly1305.Encrypt(ciphertextActual, _plaintext.Pad(), _key.Pad(), _nonce.Pad());
+            var ciphertextActual = new byte[_plaintext.Length + _box.MacSizeInBytes].Pad();
+            _box.Encrypt(ciphertextActual, _plaintext.Pad(), _nonce.Pad());
             TestHelpers.AssertEqualBytes(_ciphertext, ciphertextActual.UnPad());
         }
 
         [TestMethod]
         public void DecryptSuccess()
         {
-            var plaintextActual = XSalsa20Poly1305.TryDecrypt(_ciphertext, _key, _nonce);
+            var plaintextActual = _box.TryDecrypt(_ciphertext, _nonce);
             TestHelpers.AssertEqualBytes(_plaintext, plaintextActual);
         }
 
         [TestMethod]
         public void DecryptSuccessSegments()
         {
-            var plaintextActual = new byte[_ciphertext.Length - XSalsa20Poly1305.MacSizeInBytes].Pad();
-            var success = XSalsa20Poly1305.TryDecrypt(plaintextActual, _ciphertext.Pad(), _key.Pad(), _nonce.Pad());
+            var plaintextActual = new byte[_ciphertext.Length - _box.MacSizeInBytes].Pad();
+            var success = _box.TryDecrypt(plaintextActual, _ciphertext.Pad(), _nonce.Pad());
             Assert.IsTrue(success);
             TestHelpers.AssertEqualBytes(_plaintext, plaintextActual.UnPad());
         }
@@ -103,7 +105,7 @@ namespace Chaos.NaCl.Tests
         {
             foreach (var brokenCiphertext in _ciphertext.WithChangedBit())
             {
-                var plaintextActual = XSalsa20Poly1305.TryDecrypt(brokenCiphertext, _key, _nonce);
+                var plaintextActual = _box.TryDecrypt(brokenCiphertext, _nonce);
                 Assert.AreEqual(null, plaintextActual);
             }
         }
@@ -113,11 +115,13 @@ namespace Chaos.NaCl.Tests
         {
             foreach (var brokenCiphertext in _ciphertext.WithChangedBit())
             {
-                var plaintextActual = new byte[_ciphertext.Length - XSalsa20Poly1305.MacSizeInBytes].Pad();
+                // Fill the plaintext with a non zero value
+                var plaintextActual = new byte[_ciphertext.Length - _box.MacSizeInBytes].Pad();
                 for (int i = 0; i < plaintextActual.Count; i++)
                     plaintextActual.Array[plaintextActual.Offset + i] = 0x37;
-                var success = XSalsa20Poly1305.TryDecrypt(plaintextActual, brokenCiphertext.Pad(), _key.Pad(), _nonce.Pad());
+                var success = _box.TryDecrypt(plaintextActual, brokenCiphertext.Pad(), _nonce.Pad());
                 Assert.IsFalse(success);
+                // verify that the plaintext has been overwritten with zeros
                 TestHelpers.AssertEqualBytes(new byte[_plaintext.Length], plaintextActual.UnPad());
             }
         }
@@ -125,8 +129,18 @@ namespace Chaos.NaCl.Tests
         [TestMethod]
         public void DecryptTooShort()
         {
-            var plaintextActual = XSalsa20Poly1305.TryDecrypt(new byte[15], _key, _nonce);
+            var plaintextActual = _box.TryDecrypt(new byte[15], _nonce);
             Assert.AreEqual(null, plaintextActual);
+        }
+
+        [TestMethod]
+        public void DecryptZerosFailManyLengths()
+        {
+            for (int length = 0; length < 100; length++)
+            {
+                var plaintextActual = _box.TryDecrypt(new byte[length], _nonce);
+                Assert.AreEqual(null, plaintextActual);
+            }
         }
 
         [TestMethod]
@@ -135,8 +149,8 @@ namespace Chaos.NaCl.Tests
             for (int length = 0; length < 1000; length++)
             {
                 var plaintextExpected = Enumerable.Range(0, length).Select(i => (byte)i).ToArray();
-                var ciphertext = XSalsa20Poly1305.Encrypt(plaintextExpected.ToArray(), _key, _nonce);
-                var plaintextActual = XSalsa20Poly1305.TryDecrypt(ciphertext, _key, _nonce);
+                var ciphertext = _box.Encrypt(plaintextExpected.ToArray(), _nonce);
+                var plaintextActual = _box.TryDecrypt(ciphertext, _nonce);
                 TestHelpers.AssertEqualBytes(plaintextExpected, plaintextActual);
             }
         }
@@ -147,11 +161,11 @@ namespace Chaos.NaCl.Tests
             for (int length = 0; length < 1000; length++)
             {
                 var plaintextExpected = Enumerable.Range(0, length).Select(i => (byte)i).ToArray();
-                var ciphertext = new byte[plaintextExpected.Length + XSalsa20Poly1305.MacSizeInBytes].Pad();
+                var ciphertext = new byte[plaintextExpected.Length + _box.MacSizeInBytes].Pad();
                 var plaintextActual = new byte[plaintextExpected.Length].Pad();
-                XSalsa20Poly1305.Encrypt(ciphertext, plaintextExpected.ToArray().Pad(), _key.Pad(), _nonce.Pad());
+                _box.Encrypt(ciphertext, plaintextExpected.ToArray().Pad(), _nonce.Pad());
                 ciphertext.UnPad();//verify padding
-                XSalsa20Poly1305.TryDecrypt(plaintextActual, ciphertext, _key.Pad(), _nonce.Pad());
+                _box.TryDecrypt(plaintextActual, ciphertext, _nonce.Pad());
                 TestHelpers.AssertEqualBytes(plaintextExpected, plaintextActual.UnPad());
             }
         }
@@ -162,10 +176,10 @@ namespace Chaos.NaCl.Tests
             for (int length = 0; length < 130; length++)//130 bytes exceeds two blocks
             {
                 var originalPlaintext = Enumerable.Range(0, length).Select(i => (byte)i).ToArray();
-                var ciphertext = XSalsa20Poly1305.Encrypt(originalPlaintext.ToArray(), _key, _nonce);
+                var ciphertext = _box.Encrypt(originalPlaintext.ToArray(), _nonce);
                 foreach (var brokenCiphertext in ciphertext.WithChangedBit())
                 {
-                    var plaintextActual = XSalsa20Poly1305.TryDecrypt(brokenCiphertext, _key, _nonce);
+                    var plaintextActual = _box.TryDecrypt(brokenCiphertext, _nonce);
                     Assert.AreEqual(null, plaintextActual);
                 }
             }

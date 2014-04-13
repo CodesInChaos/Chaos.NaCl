@@ -123,7 +123,7 @@ namespace Chaos.NaCl.Benchmark
                 var ciphertext = new byte[message.Length + 16];
                 var key = new byte[32];
                 var nonce = new byte[24];
-                Benchmark(() => XSalsa20Poly1305.Encrypt(new ArraySegment<byte>(ciphertext), new ArraySegment<byte>(message), new ArraySegment<byte>(key), new ArraySegment<byte>(nonce)), n);
+                Benchmark(() => SecretBox.XSalsa20Poly1305.Create(key).Encrypt(new ArraySegment<byte>(ciphertext), new ArraySegment<byte>(message), new ArraySegment<byte>(nonce)), n);
                 Console.WriteLine("SHA512Managed");
                 Benchmark(() => new SHA512Managed().ComputeHash(message), n);
                 Console.WriteLine("SHA512Cng");

@@ -24,6 +24,7 @@
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>false</RunCodeAnalysis>
     <CodeAnalysisRuleSet>SecurityRules.ruleset</CodeAnalysisRuleSet>
+    <CheckForOverflowUnderflow>true</CheckForOverflowUnderflow>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -39,6 +40,7 @@
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="IAuthenticatedStreamEncryption.cs" />
     <Compile Include="Internal\Array8.cs" />
     <Compile Include="Internal\ByteIntegerConverter.cs" />
     <Compile Include="CryptoBytes.cs" />
@@ -103,8 +105,14 @@
     <Compile Include="Internal\Salsa\Salsa20.cs" />
     <Compile Include="Internal\Salsa\SalsaCore.cs" />
     <Compile Include="Properties\AssemblyInfoFull.cs" />
+    <Compile Include="PublicKeyBox.cs" />
+    <Compile Include="SecretBox.cs" />
+    <Compile Include="SecretBoxXSalsa20Poly1305.cs" />
     <Compile Include="Sha512.cs" />
     <Compile Include="XSalsa20Poly1305.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
