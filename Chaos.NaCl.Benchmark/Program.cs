@@ -14,22 +14,32 @@ namespace Chaos.NaCl.Benchmark
     {
         static uint CpuFreq;
 
+        private const uint CpuFreqFallback = 2901;
+
+        private static uint GetCpuFreq(string name)
+        {
+            try
+            {
+                using (ManagementBaseObject mo = new ManagementObject("Win32_Processor.DeviceID='CPU0'"))
+                {
+                    return (uint)(mo[name]);
+                }
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("Could not get CPU Frequency");
+                return CpuFreqFallback;
+            }
+        }
+
         static uint GetCurrentCpuFreq()
         {
-            return 2901;
-            using (ManagementBaseObject mo = new ManagementObject("Win32_Processor.DeviceID='CPU0'"))
-            {
-                return (uint)(mo["CurrentClockSpeed"]);
-            }
+            return GetCpuFreq("CurrentClockSpeed");
         }
 
         static uint GetMaxCpuFreq()
         {
-            return 2901;
-            using (ManagementBaseObject mo = new ManagementObject("Win32_Processor.DeviceID='CPU0'"))
-            {
-                return (uint)(mo["MaxClockSpeed"]);
-            }
+            return GetCpuFreq("MaxClockSpeed");
         }
 
         static void CheckCurrentCpuFreq()
@@ -39,19 +49,25 @@ namespace Chaos.NaCl.Benchmark
                 Console.WriteLine("Current CPU-Frequency: {0} MHz differs from max", currentFreq);
         }
 
-
-
-        static void Benchmark(Action action, int n)
+        static void Benchmark(Action action, int n, int bytes = 0)
         {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
             var start = DateTime.UtcNow;
             for (int i = 0; i < n; i++)
                 action();
             var total = (DateTime.UtcNow - start).TotalSeconds;
             var perIteration = total / n;
             Console.WriteLine("{0} us / {1} per second / {2} cycles", Math.Round(perIteration * 1E6, 2), Math.Round(1 / perIteration), Math.Round(perIteration * CpuFreq * 1E6));
+            if (bytes > 0)
+            {
+                double bytesPerSecond = bytes / perIteration;
+                double cyclesPerByte = (CpuFreq * 1E6) / bytesPerSecond;
+                Console.WriteLine("{0} MB/s / {1} cycles/byte", Math.Round(bytesPerSecond / 1E6, 2), Math.Round(cyclesPerByte, 2));
+            }
         }
 
-        static void Main(string[] args)
+        static void Main()
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             Console.WriteLine("Architecture: {0} bit", IntPtr.Size * 8);
@@ -75,6 +91,7 @@ namespace Chaos.NaCl.Benchmark
 
             const int n = 10000;
 
+            Console.WriteLine("HSalsa20Core");
             Benchmark(() =>
                 {
                     byte[] input = new byte[64]{
@@ -88,7 +105,7 @@ namespace Chaos.NaCl.Benchmark
                     {
                         SalsaCore.HSalsa(out state, ref state, 20);
                     }
-                }, 100);
+                }, 100, 64000000);
 
             Console.WriteLine("=== Edwards ===");
             CheckCurrentCpuFreq();
@@ -117,21 +134,21 @@ namespace Chaos.NaCl.Benchmark
             Console.WriteLine("=== Symmetric ===");
             CheckCurrentCpuFreq();
             {
-                int size = 128 * 1024;
+                const int size = 128 * 1024;
                 Console.WriteLine("XSalsa20Poly1305 Encrypt {0} KiB", size / 1024.0);
                 var message = new byte[size];
                 var ciphertext = new byte[message.Length + 16];
                 var key = new byte[32];
                 var nonce = new byte[24];
-                Benchmark(() => XSalsa20Poly1305.Encrypt(new ArraySegment<byte>(ciphertext), new ArraySegment<byte>(message), new ArraySegment<byte>(key), new ArraySegment<byte>(nonce)), n);
+                Benchmark(() => XSalsa20Poly1305.Encrypt(new ArraySegment<byte>(ciphertext), new ArraySegment<byte>(message), new ArraySegment<byte>(key), new ArraySegment<byte>(nonce)), n, size);
                 Console.WriteLine("SHA512Managed");
-                Benchmark(() => new SHA512Managed().ComputeHash(message), n);
+                Benchmark(() => new SHA512Managed().ComputeHash(message), n, size);
                 Console.WriteLine("SHA512Cng");
-                Benchmark(() => new SHA512Cng().ComputeHash(message), n);
+                Benchmark(() => new SHA512Cng().ComputeHash(message), n, size);
                 Console.WriteLine("SHA512CSP");
-                Benchmark(() => new SHA512CryptoServiceProvider().ComputeHash(message), n);
+                Benchmark(() => new SHA512CryptoServiceProvider().ComputeHash(message), n, size);
                 Console.WriteLine("SHA512Chaos");
-                Benchmark(() => Sha512.Hash(message), n);
+                Benchmark(() => Sha512.Hash(message), n, size);
             }
             CheckCurrentCpuFreq();
         }
