@@ -141,5 +141,40 @@ namespace Chaos.NaCl.Tests
                 Assert.IsFalse(Ed25519.Verify(modifiedSignature.Pad(), message.Pad(), pk.Pad()));
             }
         }
+
+        [TestMethod]
+        public void KeyExchange()
+        {
+            var seed = new byte[32];
+
+            byte[] publicEdwards, privateEdwards;
+            Ed25519.KeyPairFromSeed(out publicEdwards, out privateEdwards, seed);
+            var sharedEdwards = Ed25519.KeyExchange(publicEdwards, privateEdwards);
+
+            var privateMontgomery = Sha512.Hash(seed).Take(32).ToArray();
+            var publicMontgomery = MontgomeryCurve25519.GetPublicKey(privateMontgomery);
+            var sharedMontgomery = MontgomeryCurve25519.KeyExchange(publicMontgomery, privateMontgomery);
+
+            TestHelpers.AssertEqualBytes(sharedMontgomery, sharedEdwards);
+        }
+
+        [TestMethod]
+        public void KeyExchangeSegments()
+        {
+            var seed = new byte[32].Pad();
+
+            var publicEdwards = new byte[32].Pad();
+            var privateEdwards = new byte[64].Pad();
+            Ed25519.KeyPairFromSeed(publicEdwards, privateEdwards, seed);
+            var sharedEdwards = new byte[32].Pad();
+            Ed25519.KeyExchange(sharedEdwards, publicEdwards, privateEdwards);
+
+            var privateMontgomery = Sha512.Hash(seed.UnPad()).Take(32).ToArray();
+            var publicMontgomery = MontgomeryCurve25519.GetPublicKey(privateMontgomery);
+            var sharedMontgomery = MontgomeryCurve25519.KeyExchange(publicMontgomery, privateMontgomery);
+
+            TestHelpers.AssertEqualBytes(sharedMontgomery, sharedEdwards.UnPad());
+        }
+
     }
 }
