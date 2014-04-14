@@ -53,7 +53,7 @@ namespace Chaos.NaCl
             int differentbits = 0;
             for (int i = 0; i < length; i++)
                 differentbits |= x[xOffset + i] ^ y[yOffset + i];
-            return (1 & (((uint)differentbits - 1) >> 8));
+            return (1 & (unchecked((uint)differentbits - 1) >> 8));
         }
 
         public static void Wipe(byte[] data)

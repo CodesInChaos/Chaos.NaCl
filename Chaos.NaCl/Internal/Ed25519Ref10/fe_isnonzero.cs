@@ -31,7 +31,7 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
             differentBits |= fr.x7;
             differentBits |= fr.x8;
             differentBits |= fr.x9;
-            return (int)((((uint)differentBits - 1) >> 31) ^ 1);
+            return (int)((unchecked((uint)differentBits - 1) >> 31) ^ 1);
         }
     }
 }
