@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chaos.NaCl.Benchmark", "Cha
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chaos.NaCl.Tests", "Chaos.NaCl.Tests\Chaos.NaCl.Tests.csproj", "{433DF668-E178-4F13-A500-4D3609F450B9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chaos.NaCl-Portable", "Chaos.NaCl\Chaos.NaCl-Portable.csproj", "{992710C3-DFC9-4CC1-A38B-B3F7E4A41B1C}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chaos.NaCl.Benchmark32", "Chaos.NaCl.Benchmark32\Chaos.NaCl.Benchmark32.csproj", "{414429EE-D02E-485B-BE58-52DF33CF56AA}"
 EndProject
 Global
@@ -29,10 +27,6 @@ Global
 		{433DF668-E178-4F13-A500-4D3609F450B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{433DF668-E178-4F13-A500-4D3609F450B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{433DF668-E178-4F13-A500-4D3609F450B9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{992710C3-DFC9-4CC1-A38B-B3F7E4A41B1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{992710C3-DFC9-4CC1-A38B-B3F7E4A41B1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{992710C3-DFC9-4CC1-A38B-B3F7E4A41B1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{992710C3-DFC9-4CC1-A38B-B3F7E4A41B1C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{414429EE-D02E-485B-BE58-52DF33CF56AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{414429EE-D02E-485B-BE58-52DF33CF56AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{414429EE-D02E-485B-BE58-52DF33CF56AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
