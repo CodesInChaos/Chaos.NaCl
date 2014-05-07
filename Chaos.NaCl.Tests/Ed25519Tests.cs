@@ -97,9 +97,19 @@ namespace Chaos.NaCl.Tests
             return result;
         }
 
+        private byte[] AddLToSignature(byte[] signature)
+        {
+            return signature.Take(32).Concat(AddL(signature.Skip(32))).ToArray();
+        }
+
         // Ed25519 is malleable in the `S` part of the signature
         // One can add (a multiple of) the order of the subgroup `l` to `S` without invalidating the signature
-        // I consider rejecting signatures with S >= l
+        // The implementation only checks if the 3 high bits are zero, which is equivalent to checking if S < 2^253
+        // since `l` is only slightly larger than 2^252 this means that you can add `l` to almost every signature
+        // *once* without violating this condition, adding it twice will exceed 2^253 causing the signature to be rejected
+        // This test serves to document the *is* behaviour, and doesn't define *should* behaviour
+        //
+        // I consider rejecting signatures with S >= l, but should probably talk to upstream and libsodium before that
         [TestMethod]
         public void MalleabilityAddL()
         {
@@ -109,8 +119,10 @@ namespace Chaos.NaCl.Tests
             Ed25519.KeyPairFromSeed(out pk, out sk, new byte[32]);
             var signature = Ed25519.Sign(message, sk);
             Assert.IsTrue(Ed25519.Verify(signature, message, pk));
-            var modifiedSignature = signature.Take(32).Concat(AddL(signature.Skip(32))).ToArray();
+            var modifiedSignature = AddLToSignature(signature);
             Assert.IsTrue(Ed25519.Verify(modifiedSignature, message, pk));
+            var modifiedSignature2 = AddLToSignature(modifiedSignature);
+            Assert.IsFalse(Ed25519.Verify(modifiedSignature2, message, pk));
         }
 
         [TestMethod]
