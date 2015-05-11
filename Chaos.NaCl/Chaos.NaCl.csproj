@@ -42,6 +42,7 @@
     <Compile Include="Internal\Array8.cs" />
     <Compile Include="Internal\ByteIntegerConverter.cs" />
     <Compile Include="CryptoBytes.cs" />
+    <Compile Include="Internal\Ed25519Ref10\fe_bytesLE.cs" />
     <Compile Include="Internal\Ed25519Ref10\fe_cswap.cs" />
     <Compile Include="Internal\Ed25519Ref10\fe_mul121666.cs" />
     <Compile Include="Internal\Ed25519Ref10\scalarmult.cs" />
