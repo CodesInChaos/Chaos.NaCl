@@ -1,4 +1,4 @@
-Chaos.NaCl
+Chaos.NaCl + Elligator
 ==========
 
 Chaos.NaCl is a cryptography library written in C#. It is based on djb's NaCl.
