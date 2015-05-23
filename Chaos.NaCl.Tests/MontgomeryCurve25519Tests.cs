@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Security.Cryptography;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Chaos.NaCl.Tests
@@ -48,6 +49,30 @@ namespace Chaos.NaCl.Tests
             if (MontgomeryCurve25519.GetElligatorPublicKey(elligatorKey, privateKey))
             {
                 throw new Exception("The key is not suitable for Elligator");
+            }
+
+        }
+
+
+        [TestMethod]
+        public void ElligatorRandomKeys()
+        {
+            var rng = new RNGCryptoServiceProvider();
+            var priv = new byte[32].Pad();
+            var elligatorKey = new byte[32].Pad();
+            var bytes = new byte[32];
+            var restoredKey = new byte[32].Pad();
+            var originalKey = new byte[32].Pad();
+            for (var i = 0; i < 1000; i++)
+            {
+                rng.GetBytes(bytes);
+                Array.Copy(bytes, 0, priv.Array, priv.Offset, 32);
+                if (MontgomeryCurve25519.GetElligatorPublicKey(elligatorKey, priv))
+                {
+                    MontgomeryCurve25519.GetPublicKeyFromRepresentative(restoredKey, elligatorKey);
+                    MontgomeryCurve25519.GetPublicKey(originalKey, priv);
+                    TestHelpers.AssertEqualBytes(originalKey.UnPad(), restoredKey.UnPad());
+                }
             }
 
         }
