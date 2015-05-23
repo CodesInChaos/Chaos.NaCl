@@ -31,6 +31,28 @@ namespace Chaos.NaCl.Tests
         }
 
         [TestMethod]
+        public void GetElligatorPublicKeySegments()
+        {
+            var privateKey = MontgomeryCurve25519TestVectors.BobPrivateKey.Pad();
+            var elligatorKey = new byte[32].Pad();
+            if (MontgomeryCurve25519.GetElligatorPublicKey(elligatorKey, privateKey))
+            {
+                var originalKey = new byte[32].Pad();
+                MontgomeryCurve25519.GetPublicKeyFromRepresentative(originalKey, elligatorKey);
+                TestHelpers.AssertEqualBytes(MontgomeryCurve25519TestVectors.BobPublicKey, originalKey.UnPad());
+            }
+
+
+            privateKey = MontgomeryCurve25519TestVectors.AlicePrivateKey.Pad();
+            elligatorKey = new byte[32].Pad();
+            if (MontgomeryCurve25519.GetElligatorPublicKey(elligatorKey, privateKey))
+            {
+                throw new Exception("The key is not suitable for Elligator");
+            }
+
+        }
+
+        [TestMethod]
         public void GetSharedKeySegments()
         {
             var bobPublic = MontgomeryCurve25519TestVectors.BobPublicKey.Pad();

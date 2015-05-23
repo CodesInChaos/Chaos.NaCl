@@ -5,14 +5,14 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
 {
     internal static partial class FieldOperations
     {
-        public static bool Elligator(out byte[] publicKey, out byte[] representative, ref byte[] privateKey)
+        public static bool Elligator(byte[] representative, int representativeOffset, byte[] privateKey, int privatekeyOffset)
         {
             GroupElementP3 AA;
 
-            byte[] h = Sha512.Hash(privateKey, 0, 32);//ToDo: Remove alloc
-            ScalarOperations.sc_clamp(h, 0);
+            //byte[] h = Sha512.Hash(privateKey, privatekeyOffset, 32);//ToDo: Remove alloc
+            ScalarOperations.sc_clamp(privateKey, privatekeyOffset);
 
-            ge_scalarmult_base(out AA, h, 0);
+            ge_scalarmult_base(out AA, privateKey, privatekeyOffset);
 
             FieldElement inv1;
             fe_sub(out inv1, ref AA.Z, ref AA.Y); /* edwards25519.FeSub(&inv1, &A.Z, &A.Y) */
@@ -61,8 +61,6 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
                                                // chi[1] is either 0 or 0xff
             if (chiBytes[1] == 0xff)
             {
-                representative = null;
-                publicKey = null;
                 return false;
             }
 
@@ -112,32 +110,30 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
             var vInSquareRootImage = fe_bytesLE(ref vBytes, ref halfQMinus1Bytes); /* vInSquareRootImage := feBytesLE(&vBytes, &halfQMinus1Bytes) */
             fe_cmov(ref r, ref r1, vInSquareRootImage); /* edwards25519.FeCMove(&r, &r1, vInSquareRootImage) */
 
-
-            publicKey = new byte[32];
-            representative = new byte[32];
-            fe_tobytes(publicKey, 0, ref u); /* edwards25519.FeToBytes(publicKey, &u) */
-            fe_tobytes(representative, 0, ref r);  /* edwards25519.FeToBytes(representative, &r) */
+            var pub = new byte[32];
+            fe_tobytes(pub,0, ref u);
+            fe_tobytes(representative, representativeOffset, ref r);  /* edwards25519.FeToBytes(representative, &r) */
             return true;
         }
 
 
-        public static void RepresentativeToPublicKey(out byte[] publicKey, ref byte[] representative)
+        public static void RepresentativeToPublicKey(byte[] publicKey, int publickeyOffset, byte[] representative, int representativeOffset)
         {
             FieldElement rr2, v, e;
 
-            fe_frombytes(out rr2, representative, 0);
+            fe_frombytes(out rr2, representative, representativeOffset);
 
             fe_sq2(out rr2, ref rr2);
             rr2.x0++;
             fe_invert(out rr2, ref rr2);
-            fe_mul(out v, ref LookupTables.A, ref rr2);
+            fe_mul(out v, ref A, ref rr2);
             fe_neg(out v, ref v);
 
             FieldElement v2, v3;
             fe_sq(out v2, ref v);
             fe_mul(out v3, ref v, ref v2);
             fe_add(out e, ref v3, ref v);
-            fe_mul(out v2, ref v2, ref LookupTables.A);
+            fe_mul(out v2, ref v2, ref A);
             fe_add(out e, ref v2, ref e);
 
             chi(out e, ref e);
@@ -150,10 +146,9 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
             fe_neg(out negV, ref v);
             fe_cmov(ref v, ref negV, eIsMinus1);
             fe_0(out v2);
-            fe_cmov(ref v2, ref LookupTables.A, eIsMinus1);
+            fe_cmov(ref v2, ref A, eIsMinus1);
             fe_sub(out v, ref v, ref v2);
-            publicKey = new byte[32];
-            fe_tobytes(publicKey, 0, ref v);
+            fe_tobytes(publicKey, publickeyOffset, ref v);
         }
     }
 }
