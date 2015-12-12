@@ -156,3 +156,18 @@ and uses the special characters `+`, `/` and `=`.
 Decodes a Base64 encoded string back to bytes.
 
 *variable time*
+
+It is the caller's responsibility to randomize the 2 high bits of the
+representative, and to mask out said randomness before converting back from
+the representative to the public key.
+
+This will look something like:
+
+        // Assuming `repr` holds the representative from ScalarBaseMult...
+        uint8_t bits;
+        random_bytes(&bits, 1);
+        repr[31] |= bits & 0xc0;
+
+        // ... on the other side, mask out the 2 bits, then reverse the map.
+        repr[31] &= ~ 0xc0;
+        RepresentativeToPublicKey(pub, repr);
