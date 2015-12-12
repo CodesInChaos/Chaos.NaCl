@@ -2,14 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Security.Cryptography;
+using Chaos.NaCl.Internal.Ed25519Ref10;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using static Chaos.NaCl.Internal.Ed25519Ref10.Ed25519Operations;
 
 namespace Chaos.NaCl.Tests
 {
+
     [TestClass]
     public class Ed25519Tests
     {
-        [AssemblyInitializeAttribute]
+        [AssemblyInitialize]
         public static void LoadTestVectors(TestContext context)
         {
             Ed25519TestVectors.LoadTestCases();

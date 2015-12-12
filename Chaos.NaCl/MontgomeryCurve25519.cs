@@ -59,6 +59,36 @@ namespace Chaos.NaCl
             FieldOperations.fe_tobytes(publicKey.Array, publicKey.Offset, ref publicKeyFE);
         }
 
+        public static bool GetElligatorPublicKey(ArraySegment<byte> publicKey, ArraySegment<byte> privateKey)
+        {
+            if (publicKey.Array == null)
+                throw new ArgumentNullException("publicKey.Array");
+            if (privateKey.Array == null)
+                throw new ArgumentNullException("privateKey.Array");
+            if (publicKey.Count != PublicKeySizeInBytes)
+                throw new ArgumentException("privateKey.Count must be 32");
+            if (privateKey.Count != PrivateKeySizeInBytes)
+                throw new ArgumentException("privateKey.Count must be 32");
+
+            return FieldOperations.Elligator(publicKey.Array, publicKey.Offset, privateKey.Array, privateKey.Offset);
+        }
+
+
+        public static void GetPublicKeyFromRepresentative(ArraySegment<byte> publicKey, ArraySegment<byte> representative)
+        {
+            if (publicKey.Array == null)
+                throw new ArgumentNullException("publicKey.Array");
+            if (representative.Array == null)
+                throw new ArgumentNullException("representative.Array");
+            if (publicKey.Count != PublicKeySizeInBytes)
+                throw new ArgumentException("publicKey.Count must be 32");
+            if (representative.Count != PrivateKeySizeInBytes)
+                throw new ArgumentException("representative.Count must be 32");
+
+            FieldOperations.RepresentativeToPublicKey(publicKey.Array, publicKey.Offset, representative.Array,
+                representative.Offset);
+        }
+
         // hashes like the Curve25519 paper says
         internal static void KeyExchangeOutputHashCurve25519Paper(byte[] sharedKey, int offset)
         {
