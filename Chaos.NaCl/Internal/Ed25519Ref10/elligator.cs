@@ -110,6 +110,20 @@ namespace Chaos.NaCl.Internal.Ed25519Ref10
             var vInSquareRootImage = fe_bytesLE(ref vBytes, ref halfQMinus1Bytes); /* vInSquareRootImage := feBytesLE(&vBytes, &halfQMinus1Bytes) */
             fe_cmov(ref r, ref r1, vInSquareRootImage); /* edwards25519.FeCMove(&r, &r1, vInSquareRootImage) */
 
+            /*
+             /* 5.5: Here |b| means b if b in {0, 1, ..., (q - 1)/2}, otherwise -b. 
+            +uint8_t rBytes[32];
+            +r.toBytes(rBytes);
+            +unsigned int negateB = (1 & ~feBytesLE(rBytes, halfQMinus1Bytes));
+            +r1.neg(r);
+            +r.cmov(r1, negateB);
+            */
+            var rbytes = new byte[32];
+            fe_tobytes(rbytes,0, ref r);
+            var negateB = (1 & ~fe_bytesLE(ref rbytes, ref halfQMinus1Bytes));
+            fe_neg(out r1, ref r);
+            fe_cmov(ref r, ref r1, negateB);
+
             var pub = new byte[32];
             fe_tobytes(pub,0, ref u);
             fe_tobytes(representative, representativeOffset, ref r);  /* edwards25519.FeToBytes(representative, &r) */
