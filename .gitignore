@@ -8,3 +8,4 @@ obj/
 Debug/
 Release/
 TestResults/
+.vs/

@@ -2,24 +2,23 @@
 using System.Collections.Generic;
 using System.Linq;
 using Chaos.NaCl.Internal;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace Chaos.NaCl.Tests
 {
-    [TestClass]
+    
     public class InternalAssertTests
     {
-        [TestMethod]
+        [Fact]
         public void AssertSuccess()
         {
             InternalAssert.Assert(true, "a");
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
+        [Fact]
         public void AssertFail()
         {
-            InternalAssert.Assert(false, "a");
+            Assert.Throws<InvalidOperationException>(() => InternalAssert.Assert(false, "a"));
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace Chaos.NaCl.Tests
 {
@@ -20,7 +20,7 @@ namespace Chaos.NaCl.Tests
 
         public static void AssertEqualBytes(byte[] expected, byte[] actual)
         {
-            Assert.AreEqual(BitConverter.ToString(expected), BitConverter.ToString(actual));
+            Assert.Equal(BitConverter.ToString(expected), BitConverter.ToString(actual));
         }
 
         public static ArraySegment<byte> Pad(this byte[] array)
