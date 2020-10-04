@@ -178,5 +178,14 @@ namespace Chaos.NaCl
             FieldOperations.fe_tobytes(edwards.Array, edwards.Offset, ref edwardsY);
             edwards.Array[edwards.Offset + 31] |= (byte)(montgomery.Array[montgomery.Offset + 31] & 0x80);// copy sign
         }
+
+        public static void EdwardsToMontgomeryPrivate(ArraySegment<byte> montgomeryPrivate, ArraySegment<byte> edwardsPrivate)
+        {
+            var montgomery = Sha512.Hash(edwardsPrivate.Array[..32]);
+
+            ScalarOperations.sc_clamp(montgomery, 0);
+
+            Array.Copy(montgomery, montgomeryPrivate.Array, 32);
+        }
     }
 }
