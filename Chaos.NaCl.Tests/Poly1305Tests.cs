@@ -1,23 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace Chaos.NaCl.Tests
 {
-    [TestClass]
-    class Poly1305Tests
+    
+    public class Poly1305Tests
     {
-        [TestMethod]
+        [Fact]
         public void KeySizeIs32()
         {
-            Assert.AreEqual(32, OneTimeAuth.Poly1305.KeySizeInBytes);
+            Assert.Equal(32, OneTimeAuth.Poly1305.KeySizeInBytes);
         }
 
-        [TestMethod]
+        [Fact]
         public void SignatureSizeIs16()
         {
-            Assert.AreEqual(32, OneTimeAuth.Poly1305.SignatureSizeInBytes);
+            Assert.Equal(16, OneTimeAuth.Poly1305.SignatureSizeInBytes);
         }
     }
 }

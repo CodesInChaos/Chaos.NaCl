@@ -2,11 +2,11 @@
 using System.Linq;
 using Chaos.NaCl.Internal;
 using Chaos.NaCl.Internal.Salsa;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace Chaos.NaCl.Tests
 {
-	[TestClass]
+	
 	public class SalsaCoreTests
 	{
 		private T[] ToArray<T>(Array16<T> a)
@@ -31,17 +31,17 @@ namespace Chaos.NaCl.Tests
 			return result;
 		}
 
-		[TestMethod]
+		[Fact]
 		public void Zero()
 		{
 			Array16<UInt32> input = new Array16<uint>();
 			Array16<UInt32> output;
 			UInt32[] expected = new UInt32[16];
 			SalsaCore.Salsa(out output, ref input, 20);
-			Assert.IsTrue(ToArray(output).SequenceEqual(expected));
+			Assert.True(ToArray(output).SequenceEqual(expected));
 		}
 
-		[TestMethod]
+		[Fact]
 		public void DoubleRound1()
 		{
 			Array16<UInt32> input = new Array16<uint>();
@@ -55,10 +55,10 @@ namespace Chaos.NaCl.Tests
 				0x20500000,0xa0000040,0x0008180a,0x612a8020
 			};
 			SalsaCore.HSalsa(out output, ref input, 2);
-			Assert.IsTrue(ToArray(output).SequenceEqual(expected));
+			Assert.True(ToArray(output).SequenceEqual(expected));
 		}
 
-		[TestMethod]
+		[Fact]
 		public void Salsa20()
 		{
 			byte[] input = new byte[64]{
@@ -82,7 +82,7 @@ namespace Chaos.NaCl.Tests
 		    TestHelpers.AssertEqualBytes(expectedOutput, actualOutput);
 		}
 
-		[TestMethod]
+		[Fact]
 		public void Salsa20_1000000()
 		{
 			byte[] input = new byte[64]{

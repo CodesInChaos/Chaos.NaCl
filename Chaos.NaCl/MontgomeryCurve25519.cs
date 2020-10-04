@@ -130,13 +130,62 @@ namespace Chaos.NaCl
             KeyExchangeOutputHashNaCl(sharedKey.Array, sharedKey.Offset);
         }
 
+        //internal static void EdwardsToMontgomeryX(out FieldElement montgomeryX, ref FieldElement edwardsY, ref FieldElement edwardsZ)
+        //{
+        //    FieldElement tempX, tempZ;
+        //    FieldOperations.fe_add(out tempX, ref edwardsZ, ref edwardsY);
+        //    FieldOperations.fe_sub(out tempZ, ref edwardsZ, ref edwardsY);
+        //    FieldOperations.fe_invert(out tempZ, ref tempZ);
+        //    FieldOperations.fe_mul(out montgomeryX, ref tempX, ref tempZ);
+        //}
+
         internal static void EdwardsToMontgomeryX(out FieldElement montgomeryX, ref FieldElement edwardsY, ref FieldElement edwardsZ)
         {
+            // montgomeryX = (edwardsZ + edwardsY) / (edwardsZ - edwardsY)
             FieldElement tempX, tempZ;
             FieldOperations.fe_add(out tempX, ref edwardsZ, ref edwardsY);
             FieldOperations.fe_sub(out tempZ, ref edwardsZ, ref edwardsY);
             FieldOperations.fe_invert(out tempZ, ref tempZ);
             FieldOperations.fe_mul(out montgomeryX, ref tempX, ref tempZ);
+        }
+
+        internal static void MontgomeryXToEdwards(out FieldElement edwardsY, ref FieldElement montgomeryX, ref FieldElement montgomeryZ)
+        {
+            // edwardsY = (montgomeryX - montgomeryZ) / (montgomeryX + montgomeryZ)
+            FieldElement tempY, tempZ;
+            FieldOperations.fe_sub(out tempY, ref montgomeryX, ref montgomeryZ);
+            FieldOperations.fe_add(out tempZ, ref montgomeryX, ref montgomeryZ);
+            FieldOperations.fe_invert(out tempZ, ref tempZ);
+            FieldOperations.fe_mul(out edwardsY, ref tempY, ref tempZ);
+        }
+
+        public static void EdwardsToMontgomery(ArraySegment<byte> montgomery, ArraySegment<byte> edwards)
+        {
+            FieldElement edwardsY, edwardsZ, montgomeryX;
+            FieldOperations.fe_frombytes(out edwardsY, edwards.Array, edwards.Offset);
+            FieldOperations.fe_1(out edwardsZ);
+            EdwardsToMontgomeryX(out montgomeryX, ref edwardsY, ref edwardsZ);
+            FieldOperations.fe_tobytes(montgomery.Array, montgomery.Offset, ref montgomeryX);
+            montgomery.Array[montgomery.Offset + 31] |= (byte)(edwards.Array[edwards.Offset + 31] & 0x80);// copy sign
+        }
+
+        public static void MontgomeryToEdwards(ArraySegment<byte> edwards, ArraySegment<byte> montgomery)
+        {
+            FieldElement montgomeryX, montgomeryZ, edwardsY;
+            FieldOperations.fe_frombytes(out montgomeryX, montgomery.Array, montgomery.Offset);
+            FieldOperations.fe_1(out montgomeryZ);
+            MontgomeryXToEdwards(out edwardsY, ref montgomeryX, ref montgomeryZ);
+            FieldOperations.fe_tobytes(edwards.Array, edwards.Offset, ref edwardsY);
+            edwards.Array[edwards.Offset + 31] |= (byte)(montgomery.Array[montgomery.Offset + 31] & 0x80);// copy sign
+        }
+
+        public static void EdwardsToMontgomeryPrivate(ArraySegment<byte> montgomeryPrivate, ArraySegment<byte> edwardsPrivate)
+        {
+            var montgomery = Sha512.Hash(edwardsPrivate.Array[..32]);
+
+            ScalarOperations.sc_clamp(montgomery, 0);
+
+            Array.Copy(montgomery, montgomeryPrivate.Array, 32);
         }
     }
 }

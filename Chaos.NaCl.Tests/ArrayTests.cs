@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using Chaos.NaCl.Internal;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace Chaos.NaCl.Tests
 {
-    [TestClass]
+    
     public class ArrayTests
     {
         private static readonly byte[] _testInput = Enumerable.Repeat((byte)0xFF, 100).Concat(Enumerable.Range(1, 250).Select(i => (byte)i)).ToArray();
 
-        /*[TestMethod]
+        /*[Fact]
         public void Array8FromBytesLittleEndian()
         {
             for (int len = 1; len <= 32; len++)
@@ -25,7 +25,7 @@ namespace Chaos.NaCl.Tests
             }
         }*/
 
-        /*[TestMethod]
+        /*[Fact]
         public void Array16FromBytesLittleEndian()
         {
             for (int len = 1; len <= 64; len++)

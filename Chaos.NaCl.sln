@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30413.136
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chaos.NaCl", "Chaos.NaCl\Chaos.NaCl.csproj", "{AE28FD14-7985-4707-A963-C94B8597AE50}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chaos.NaCl.Benchmark", "Chaos.NaCl.Benchmark\Chaos.NaCl.Benchmark.csproj", "{28321BA8-C416-4F81-BE4C-1546CD62118B}"
@@ -34,5 +36,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {11F0BB99-0F56-4AD1-B05A-E5D63DCF5B7A}
 	EndGlobalSection
 EndGlobal

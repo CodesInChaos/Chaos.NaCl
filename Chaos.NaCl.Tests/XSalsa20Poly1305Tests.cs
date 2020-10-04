@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace Chaos.NaCl.Tests
 {
-    [TestClass]
+    
     public class XSalsa20Poly1305Tests
     {
         readonly byte[] _key = new byte[32]
@@ -67,14 +67,14 @@ namespace Chaos.NaCl.Tests
                     , 0xe3, 0x55, 0xa5
                 };
 
-        [TestMethod]
+        [Fact]
         public void Encrypt()
         {
             var ciphertextActual = XSalsa20Poly1305.Encrypt(_plaintext, _key, _nonce);
             TestHelpers.AssertEqualBytes(_ciphertext, ciphertextActual);
         }
 
-        [TestMethod]
+        [Fact]
         public void EncryptSegments()
         {
             var ciphertextActual = new byte[_plaintext.Length + XSalsa20Poly1305.MacSizeInBytes].Pad();
@@ -82,33 +82,33 @@ namespace Chaos.NaCl.Tests
             TestHelpers.AssertEqualBytes(_ciphertext, ciphertextActual.UnPad());
         }
 
-        [TestMethod]
+        [Fact]
         public void DecryptSuccess()
         {
             var plaintextActual = XSalsa20Poly1305.TryDecrypt(_ciphertext, _key, _nonce);
             TestHelpers.AssertEqualBytes(_plaintext, plaintextActual);
         }
 
-        [TestMethod]
+        [Fact]
         public void DecryptSuccessSegments()
         {
             var plaintextActual = new byte[_ciphertext.Length - XSalsa20Poly1305.MacSizeInBytes].Pad();
             var success = XSalsa20Poly1305.TryDecrypt(plaintextActual, _ciphertext.Pad(), _key.Pad(), _nonce.Pad());
-            Assert.IsTrue(success);
+            Assert.True(success);
             TestHelpers.AssertEqualBytes(_plaintext, plaintextActual.UnPad());
         }
 
-        [TestMethod]
+        [Fact]
         public void DecryptFail()
         {
             foreach (var brokenCiphertext in _ciphertext.WithChangedBit())
             {
                 var plaintextActual = XSalsa20Poly1305.TryDecrypt(brokenCiphertext, _key, _nonce);
-                Assert.AreEqual(null, plaintextActual);
+                Assert.Equal(null, plaintextActual);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void DecryptFailSegments()
         {
             foreach (var brokenCiphertext in _ciphertext.WithChangedBit())
@@ -117,19 +117,19 @@ namespace Chaos.NaCl.Tests
                 for (int i = 0; i < plaintextActual.Count; i++)
                     plaintextActual.Array[plaintextActual.Offset + i] = 0x37;
                 var success = XSalsa20Poly1305.TryDecrypt(plaintextActual, brokenCiphertext.Pad(), _key.Pad(), _nonce.Pad());
-                Assert.IsFalse(success);
+                Assert.False(success);
                 TestHelpers.AssertEqualBytes(new byte[_plaintext.Length], plaintextActual.UnPad());
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void DecryptTooShort()
         {
             var plaintextActual = XSalsa20Poly1305.TryDecrypt(new byte[15], _key, _nonce);
-            Assert.AreEqual(null, plaintextActual);
+            Assert.Equal(null, plaintextActual);
         }
 
-        [TestMethod]
+        [Fact]
         public void RoundTripSuccessWithManyLengths()
         {
             for (int length = 0; length < 1000; length++)
@@ -141,7 +141,7 @@ namespace Chaos.NaCl.Tests
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void RoundTripSuccessWithManyLengthsSegments()
         {
             for (int length = 0; length < 1000; length++)
@@ -156,7 +156,7 @@ namespace Chaos.NaCl.Tests
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void RoundTripFailWithManyLengths()
         {
             for (int length = 0; length < 130; length++)//130 bytes exceeds two blocks
@@ -166,7 +166,7 @@ namespace Chaos.NaCl.Tests
                 foreach (var brokenCiphertext in ciphertext.WithChangedBit())
                 {
                     var plaintextActual = XSalsa20Poly1305.TryDecrypt(brokenCiphertext, _key, _nonce);
-                    Assert.AreEqual(null, plaintextActual);
+                    Assert.Equal(null, plaintextActual);
                 }
             }
         }

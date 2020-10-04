@@ -126,7 +126,7 @@ namespace Chaos.NaCl.Benchmark
                 Benchmark("HSalsa20Core", () => HSalsa20Core(size), n, size);
                 Benchmark("XSalsa20Poly1305 Encrypt", () => XSalsa20Poly1305.Encrypt(new ArraySegment<byte>(ciphertext), new ArraySegment<byte>(message), new ArraySegment<byte>(key), new ArraySegment<byte>(nonce)), n, size);
                 Benchmark("SHA512Managed", () => new SHA512Managed().ComputeHash(message), n, size);
-                Benchmark("SHA512Cng", () => new SHA512Cng().ComputeHash(message), n, size);
+                Benchmark("SHA512Cng", () => SHA512.Create().ComputeHash(message), n, size);
                 Benchmark("SHA512CSP", () => new SHA512CryptoServiceProvider().ComputeHash(message), n, size);
                 Benchmark("SHA512Chaos", () => Sha512.Hash(message), n, size);
             }

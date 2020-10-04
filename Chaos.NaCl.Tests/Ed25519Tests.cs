@@ -2,25 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace Chaos.NaCl.Tests
 {
-    [TestClass]
     public class Ed25519Tests
     {
-        [AssemblyInitializeAttribute]
-        public static void LoadTestVectors(TestContext context)
-        {
-            Ed25519TestVectors.LoadTestCases();
-            //Warmup
-            var pk = Ed25519.PublicKeyFromSeed(new byte[32]);
-            var sk = Ed25519.ExpandedPrivateKeyFromSeed(new byte[32]);
-            var sig = Ed25519.Sign(Ed25519TestVectors.TestCases.Last().Message, sk);
-            Ed25519.Verify(sig, new byte[10], pk);
-        }
-
-        [TestMethod]
+        [Fact]
         public void KeyPairFromSeed()
         {
             foreach (var testCase in Ed25519TestVectors.TestCases)
@@ -34,7 +22,7 @@ namespace Chaos.NaCl.Tests
         }
 
 
-        [TestMethod]
+        [Fact]
         public void KeyPairFromSeedSegments()
         {
             foreach (var testCase in Ed25519TestVectors.TestCases)
@@ -47,28 +35,28 @@ namespace Chaos.NaCl.Tests
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void Sign()
         {
             foreach (var testCase in Ed25519TestVectors.TestCases)
             {
                 var sig = Ed25519.Sign(testCase.Message, testCase.PrivateKey);
-                Assert.AreEqual(64, sig.Length);
+                Assert.Equal(64, sig.Length);
                 TestHelpers.AssertEqualBytes(testCase.Signature, sig);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void Verify()
         {
             foreach (var testCase in Ed25519TestVectors.TestCases)
             {
                 bool success = Ed25519.Verify(testCase.Signature, testCase.Message, testCase.PublicKey);
-                Assert.IsTrue(success);
+                Assert.True(success);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void VerifyFail()
         {
             var message = Enumerable.Range(0, 100).Select(i => (byte)i).ToArray();
@@ -76,14 +64,14 @@ namespace Chaos.NaCl.Tests
             byte[] sk;
             Ed25519.KeyPairFromSeed(out pk, out sk, new byte[32]);
             var signature = Ed25519.Sign(message, sk);
-            Assert.IsTrue(Ed25519.Verify(signature, message, pk));
+            Assert.True(Ed25519.Verify(signature, message, pk));
             foreach (var modifiedMessage in message.WithChangedBit())
             {
-                Assert.IsFalse(Ed25519.Verify(signature, modifiedMessage, pk));
+                Assert.False(Ed25519.Verify(signature, modifiedMessage, pk));
             }
             foreach (var modifiedSignature in signature.WithChangedBit())
             {
-                Assert.IsFalse(Ed25519.Verify(modifiedSignature, message, pk));
+                Assert.False(Ed25519.Verify(modifiedSignature, message, pk));
             }
         }
 
@@ -110,7 +98,7 @@ namespace Chaos.NaCl.Tests
         // This test serves to document the *is* behaviour, and doesn't define *should* behaviour
         //
         // I consider rejecting signatures with S >= l, but should probably talk to upstream and libsodium before that
-        [TestMethod]
+        [Fact]
         public void MalleabilityAddL()
         {
             var message = Enumerable.Range(0, 100).Select(i => (byte)i).ToArray();
@@ -118,24 +106,24 @@ namespace Chaos.NaCl.Tests
             byte[] sk;
             Ed25519.KeyPairFromSeed(out pk, out sk, new byte[32]);
             var signature = Ed25519.Sign(message, sk);
-            Assert.IsTrue(Ed25519.Verify(signature, message, pk));
+            Assert.True(Ed25519.Verify(signature, message, pk));
             var modifiedSignature = AddLToSignature(signature);
-            Assert.IsTrue(Ed25519.Verify(modifiedSignature, message, pk));
+            Assert.True(Ed25519.Verify(modifiedSignature, message, pk));
             var modifiedSignature2 = AddLToSignature(modifiedSignature);
-            Assert.IsFalse(Ed25519.Verify(modifiedSignature2, message, pk));
+            Assert.False(Ed25519.Verify(modifiedSignature2, message, pk));
         }
 
-        [TestMethod]
+        [Fact]
         public void VerifySegments()
         {
             foreach (var testCase in Ed25519TestVectors.TestCases)
             {
                 bool success = Ed25519.Verify(testCase.Signature.Pad(), testCase.Message.Pad(), testCase.PublicKey.Pad());
-                Assert.IsTrue(success);
+                Assert.True(success);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void VerifyFailSegments()
         {
             var message = Enumerable.Range(0, 100).Select(i => (byte)i).ToArray();
@@ -143,18 +131,18 @@ namespace Chaos.NaCl.Tests
             byte[] sk;
             Ed25519.KeyPairFromSeed(out pk, out sk, new byte[32]);
             var signature = Ed25519.Sign(message, sk);
-            Assert.IsTrue(Ed25519.Verify(signature.Pad(), message.Pad(), pk.Pad()));
+            Assert.True(Ed25519.Verify(signature.Pad(), message.Pad(), pk.Pad()));
             foreach (var modifiedMessage in message.WithChangedBit())
             {
-                Assert.IsFalse(Ed25519.Verify(signature.Pad(), modifiedMessage.Pad(), pk.Pad()));
+                Assert.False(Ed25519.Verify(signature.Pad(), modifiedMessage.Pad(), pk.Pad()));
             }
             foreach (var modifiedSignature in signature.WithChangedBit())
             {
-                Assert.IsFalse(Ed25519.Verify(modifiedSignature.Pad(), message.Pad(), pk.Pad()));
+                Assert.False(Ed25519.Verify(modifiedSignature.Pad(), message.Pad(), pk.Pad()));
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void KeyExchange()
         {
             var seed = new byte[32];
@@ -170,7 +158,7 @@ namespace Chaos.NaCl.Tests
             TestHelpers.AssertEqualBytes(sharedMontgomery, sharedEdwards);
         }
 
-        [TestMethod]
+        [Fact]
         public void KeyExchangeSegments()
         {
             var seed = new byte[32].Pad();
