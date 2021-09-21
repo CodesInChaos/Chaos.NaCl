@@ -143,5 +143,29 @@ namespace Chaos.NaCl
             FieldOperations.fe_tobytes(sharedKey.Array, sharedKey.Offset, ref sharedMontgomeryX);
             MontgomeryCurve25519.KeyExchangeOutputHashNaCl(sharedKey.Array, sharedKey.Offset);
         }
+
+        public static bool CalculateBlindedPublicKey(byte[] publicKey, byte[] blindingFator, out byte[] output)
+        {
+            if (publicKey is null)
+                throw new ArgumentNullException("publicKey.Array");
+            if (publicKey.Length != PublicKeySizeInBytes)
+                throw new ArgumentException("publicKey.Count != 32");
+
+            output = new byte[PublicKeySizeInBytes];
+
+            byte[] zeros = new byte[PublicKeySizeInBytes];
+            byte[] pkCopy = new byte[PublicKeySizeInBytes];
+            Array.Copy(publicKey, pkCopy, PublicKeySizeInBytes);
+            pkCopy[31] ^= (1 << 7);
+
+            if (GroupOperations.ge_frombytes_negate_vartime(out var A, pkCopy, 0) != 0)
+                return false;
+
+            /* There isn't a regular ge_scalarmult -- we have to do tweak*A + zero*B. */
+            GroupOperations.ge_double_scalarmult_vartime(out var Aprime, blindingFator, ref A, zeros);
+            GroupOperations.ge_tobytes(output,0, ref Aprime);
+
+            return true;
+        }
     }
 }
